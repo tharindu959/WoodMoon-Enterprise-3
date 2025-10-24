@@ -108,20 +108,19 @@ export const columns: ColumnDef<Admin>[] = [
       const admin = row.original;
 
       const handleDeleteSingle = async () => {
-        if (!confirm(`Delete admin ${admin.fullName}?`)) return;
+        if (!confirm(`Are you sure you want to delete admin "${admin.fullName}"?`)) return;
         try {
-          const res = await fetch("http://localhost:8080/api/admins/delete", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ids: [admin.id] }),
+          const res = await fetch(`http://localhost:8080/api/admins/${admin.id}`, {
+            method: "DELETE",
           });
 
-          if (!res.ok) throw new Error("delete failed");
-          alert("Admin deleted");
+          if (!res.ok) throw new Error("Failed to delete admin");
+
+          alert("✅ Admin deleted successfully!");
           window.location.reload();
         } catch (err) {
-          console.error(err);
-          alert("Failed to delete admin");
+          console.error("Error deleting admin:", err);
+          alert("❌ Failed to delete admin");
         }
       };
 

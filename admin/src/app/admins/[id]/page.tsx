@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -13,7 +17,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Progress } from "@/components/ui/progress";
-import { BadgeCheck, Shield, Star, Users } from "lucide-react";
+import { BadgeCheck, Shield, Star, Users, Trash2 } from "lucide-react";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import AddAdmin from "@/components/AddAdmin";
@@ -21,6 +25,60 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AppLineChart from "@/components/AppLineChart";
 
 const SingleAdminPage = () => {
+  const { id } = useParams();
+  const router = useRouter();
+  const [admin, setAdmin] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAdmin = async () => {
+      try {
+        const res = await fetch(`http://localhost:8080/api/admins/${id}`);
+        if (!res.ok) throw new Error("Failed to fetch admin");
+        const data = await res.json();
+        setAdmin(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) fetchAdmin();
+  }, [id]);
+
+  const handleDelete = async () => {
+    if (!confirm(`Are you sure you want to delete admin "${admin?.firstName || "this"}"?`))
+      return;
+    try {
+      const res = await fetch(`http://localhost:8080/api/admins/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Delete failed");
+
+      alert("Admin deleted successfully!");
+      router.push("/admins");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete admin.");
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="p-6 text-gray-500">
+        <p>Loading admin details...</p>
+      </div>
+    );
+
+  if (!admin)
+    return (
+      <div className="p-6 text-gray-500">
+        <p>Admin not found.</p>
+      </div>
+    );
+
   return (
     <div>
       <Breadcrumb>
@@ -103,10 +161,12 @@ const SingleAdminPage = () => {
                 <AvatarImage src="/users/default.png" />
                 <AvatarFallback>AD</AvatarFallback>
               </Avatar>
-              <h1 className="text-xl font-semibold">Admin Name</h1>
+              <h1 className="text-xl font-semibold">
+                {admin.firstName} {admin.lastName}
+              </h1>
             </div>
             <p className="text-sm text-muted-foreground">
-              Admin description or notes go here. You can later load real admin data dynamically.
+              {admin.description || "Admin description or notes go here."}
             </p>
           </div>
 
@@ -114,12 +174,22 @@ const SingleAdminPage = () => {
           <div className="bg-primary-foreground p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <h1 className="text-xl font-semibold">Admin Information</h1>
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button>Edit Admin</Button>
-                </SheetTrigger>
-                <AddAdmin />
-              </Sheet>
+              <div className="flex gap-2">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button>Edit Admin</Button>
+                  </SheetTrigger>
+                  <AddAdmin />
+                </Sheet>
+                <Button
+                  variant="destructive"
+                  onClick={handleDelete}
+                  className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-4 mt-4">
@@ -129,27 +199,27 @@ const SingleAdminPage = () => {
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Full name:</span>
-                <span>Admin Name</span>
+                <span>{admin.firstName} {admin.lastName}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Email:</span>
-                <span>admin@gmail.com</span>
+                <span>{admin.email}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Phone:</span>
-                <span>+1 987 6543</span>
+                <span>{admin.phone || "N/A"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Address:</span>
-                <span>Office HQ</span>
+                <span>{admin.address || "N/A"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">City:</span>
-                <span>Colombo</span>
+                <span>{admin.city || "N/A"}</span>
               </div>
             </div>
             <p className="text-sm text-muted-foreground mt-4">
-              Joined on 2025.01.01
+              Joined on {admin.createdAt || "Unknown"}
             </p>
           </div>
         </div>

@@ -51,21 +51,21 @@ export function DataTable<TData, TValue>({
 
   const handleDelete = async () => {
     if (selectedIds.length === 0) return;
-    if (!confirm(`Delete ${selectedIds.length} admin(s)?`)) return;
+    if (!confirm(`Are you sure you want to delete ${selectedIds.length} admin(s)?`)) return;
 
     try {
-      const res = await fetch("http://localhost:8080/api/admins/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids: selectedIds }),
-      });
+      for (const id of selectedIds) {
+        const res = await fetch(`http://localhost:8080/api/admins/${id}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error(`Failed to delete admin with ID ${id}`);
+      }
 
-      if (!res.ok) throw new Error("delete failed");
-      alert("Deleted successfully");
+      alert("✅ Selected admin(s) deleted successfully!");
       window.location.reload();
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete admins");
+      console.error("Error deleting admins:", err);
+      alert("❌ Failed to delete selected admins");
     }
   };
 
@@ -75,7 +75,7 @@ export function DataTable<TData, TValue>({
         <div className="flex justify-end">
           <button
             onClick={handleDelete}
-            className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer"
+            className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer hover:bg-red-600"
           >
             <Trash2 className="w-4 h-4" />
             Delete Admin(s)

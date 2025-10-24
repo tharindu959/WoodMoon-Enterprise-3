@@ -42,12 +42,10 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      rowSelection,
-    },
+    state: { sorting, rowSelection },
   });
- const selectedIds = table
+
+  const selectedIds = table
     .getSelectedRowModel()
     .flatRows.map((r) => (r.original as any).id);
 
@@ -56,27 +54,28 @@ export function DataTable<TData, TValue>({
     if (!confirm(`Delete ${selectedIds.length} user(s)?`)) return;
 
     try {
-      const res = await fetch("http://localhost:8080/api/admin/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids: selectedIds }),
-      });
+      for (const id of selectedIds) {
+        const res = await fetch(`http://localhost:8080/api/users/${id}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error(`Failed to delete user with ID: ${id}`);
+      }
 
-      if (!res.ok) throw new Error("delete failed");
-      alert("Deleted successfully");
+      alert("✅ Selected user(s) deleted successfully!");
       window.location.reload();
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete users");
+      console.error("Error deleting users:", err);
+      alert("❌ Failed to delete selected users");
     }
   };
+
   return (
     <div className="rounded-md border">
-       {selectedIds.length > 0 && (
+      {selectedIds.length > 0 && (
         <div className="flex justify-end">
-<button
+          <button
             onClick={handleDelete}
-            className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer"
+            className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer hover:bg-red-600"
           >
             <Trash2 className="w-4 h-4" />
             Delete User(s)
@@ -116,7 +115,10 @@ export function DataTable<TData, TValue>({
             ))
           ) : (
             <TableRow>
-             <TableCell colSpan={columns.length as any} className="h-24 text-center">
+              <TableCell
+                colSpan={columns.length as any}
+                className="h-24 text-center"
+              >
                 No results.
               </TableCell>
             </TableRow>

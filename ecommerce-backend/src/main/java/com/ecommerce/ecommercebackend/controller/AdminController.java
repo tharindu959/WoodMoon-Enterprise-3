@@ -36,4 +36,15 @@ public class AdminController {
         adminService.deleteAdmin(id);
         return ResponseEntity.noContent().build();
     }
+
+    // ✅ GET: Fetch a single admin by ID (for Admin Details page)
+@GetMapping("/{id}")
+public ResponseEntity<Admin> getAdminById(@PathVariable Long id) {
+    Admin admin = adminService.getAdminById(id);
+    if (admin == null) {
+        return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(admin);
+}
+
 }

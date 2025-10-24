@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -16,10 +17,9 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    // ✅ Client-side: Register new user
+    // ✅ Register new user (client-side)
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
-        // Optional: Check if user exists
         if (userRepository.findByEmail(user.getEmail()) != null) {
             return ResponseEntity.badRequest().build();
         }
@@ -27,10 +27,27 @@ public class UserController {
         return ResponseEntity.ok(savedUser);
     }
 
-    // ✅ Admin-side: Get all registered users
+    // ✅ Get all users (admin-side)
     @GetMapping("/all")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userRepository.findAll();
         return ResponseEntity.ok(users);
+    }
+
+    // ✅ Get a single user by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // ✅ Delete a user by ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        if (!userRepository.existsById(id)) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+        userRepository.deleteById(id);
+        return ResponseEntity.ok("User deleted successfully!");
     }
 }
