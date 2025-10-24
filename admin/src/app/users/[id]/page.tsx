@@ -1,4 +1,7 @@
-import CardList from "@/components/CardList";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -14,7 +17,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Progress } from "@/components/ui/progress";
-import { BadgeCheck, Candy, Citrus, Shield } from "lucide-react";
+import { BadgeCheck, Candy, Citrus, Shield, Trash2 } from "lucide-react";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import EditUser from "@/components/EditUser";
@@ -22,6 +25,58 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AppLineChart from "@/components/AppLineChart";
 
 const SingleUserPage = () => {
+  const { id } = useParams();
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Fetch single user
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch(`http://localhost:8080/api/users/${id}`);
+        if (!res.ok) throw new Error("Failed to fetch user");
+        const data = await res.json();
+        setUser(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) fetchUser();
+  }, [id]);
+
+  // ✅ Handle delete
+  const handleDelete = async () => {
+    if (!confirm(`Are you sure you want to delete user "${user?.firstName || "this user"}"?`)) return;
+    try {
+      const res = await fetch(`http://localhost:8080/api/users/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete user");
+      alert("✅ User deleted successfully!");
+      router.push("/users");
+    } catch (error) {
+      console.error(error);
+      alert("❌ Failed to delete user.");
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="p-6 text-gray-500">
+        <p>Loading user details...</p>
+      </div>
+    );
+
+  if (!user)
+    return (
+      <div className="p-6 text-gray-500">
+        <p>User not found.</p>
+      </div>
+    );
+
   return (
     <div className="">
       <Breadcrumb>
@@ -35,10 +90,11 @@ const SingleUserPage = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>John Doe</BreadcrumbPage>
+            <BreadcrumbPage>{`${user.firstName} ${user.lastName}`}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
       {/* CONTAINER */}
       <div className="mt-4 flex flex-col xl:flex-row gap-8">
         {/* LEFT */}
@@ -69,10 +125,9 @@ const SingleUserPage = () => {
                   />
                 </HoverCardTrigger>
                 <HoverCardContent>
-                  <h1 className="font-bold mb-2">Admin</h1>
+                  <h1 className="font-bold mb-2">Active Member</h1>
                   <p className="text-sm text-muted-foreground">
-                    Admin users have access to all features and can manage
-                    users.
+                    Regular and trusted user of the platform.
                   </p>
                 </HoverCardContent>
               </HoverCard>
@@ -86,7 +141,7 @@ const SingleUserPage = () => {
                 <HoverCardContent>
                   <h1 className="font-bold mb-2">Awarded</h1>
                   <p className="text-sm text-muted-foreground">
-                    This user has been awarded for their contributions.
+                    Recognized for valuable contributions.
                   </p>
                 </HoverCardContent>
               </HoverCard>
@@ -100,38 +155,49 @@ const SingleUserPage = () => {
                 <HoverCardContent>
                   <h1 className="font-bold mb-2">Popular</h1>
                   <p className="text-sm text-muted-foreground">
-                    This user has been popular in the community.
+                    Highly active and liked by the community.
                   </p>
                 </HoverCardContent>
               </HoverCard>
             </div>
           </div>
+
           {/* USER CARD CONTAINER */}
           <div className="bg-primary-foreground p-4 rounded-lg space-y-2">
             <div className="flex items-center gap-2">
               <Avatar className="size-12">
-                <AvatarImage src="https://avatars.githubusercontent.com/u/1486366" />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarImage src="/users/default.png" />
+                <AvatarFallback>U</AvatarFallback>
               </Avatar>
-              <h1 className="text-xl font-semibold">John Doe</h1>
+              <h1 className="text-xl font-semibold">
+                {user.firstName} {user.lastName}
+              </h1>
             </div>
             <p className="text-sm text-muted-foreground">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Vel
-              voluptas distinctio ab ipsa commodi fugiat labore quos veritatis
-              cum corrupti sed repudiandae ipsum, harum recusandae ratione ipsam
-              in, quis quia.
+              {user.description || "This user does not have a bio yet."}
             </p>
           </div>
+
           {/* INFORMATION CONTAINER */}
           <div className="bg-primary-foreground p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <h1 className="text-xl font-semibold">User Information</h1>
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button>Edit User</Button>
-                </SheetTrigger>
-                <EditUser />
-              </Sheet>
+              <div className="flex gap-2">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button>Edit User</Button>
+                  </SheetTrigger>
+                  <EditUser />
+                </Sheet>
+                <Button
+                  variant="destructive"
+                  onClick={handleDelete}
+                  className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete
+                </Button>
+              </div>
             </div>
             <div className="space-y-4 mt-4">
               <div className="flex flex-col gap-2 mb-8">
@@ -142,34 +208,35 @@ const SingleUserPage = () => {
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Full name:</span>
-                <span>John Doe</span>
+                <span>
+                  {user.firstName} {user.lastName}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Email:</span>
-                <span>john.doe@gmail.com</span>
+                <span>{user.email}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Phone:</span>
-                <span>+1 234 5678</span>
+                <span>{user.phone || "N/A"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Address:</span>
-                <span>123 Main St</span>
+                <span>{user.address || "N/A"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">City:</span>
-                <span>New York</span>
+                <span>{user.city || "N/A"}</span>
               </div>
             </div>
             <p className="text-sm text-muted-foreground mt-4">
-              Joined on 2025.01.01
+              Joined on {user.createdAt || "Unknown"}
             </p>
           </div>
         </div>
+
         {/* RIGHT */}
         <div className="w-full xl:w-2/3 space-y-6">
-          
-          {/* CHART CONTAINER */}
           <div className="bg-primary-foreground p-4 rounded-lg">
             <h1 className="text-xl font-semibold">User Activity</h1>
             <AppLineChart />

@@ -46,12 +46,13 @@ public class SecurityConfig {
             // ✅ Define which endpoints are public or protected
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints (no JWT required)
-                .requestMatchers("/api/auth/**").permitAll()    // Login/signup
-                .requestMatchers("/api/users/all").permitAll()  // Allow fetching all users
-                .requestMatchers("/api/admins/all").permitAll() // ✅ Allow fetching all admins for admin dashboard
-
-                // Optional: Allow admin creation for setup (disable in production)
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/users/**").permitAll()
+                .requestMatchers("/api/admins/all").permitAll()
                 .requestMatchers("/api/admins/create").permitAll()
+                .requestMatchers("/api/admins/{id}").permitAll()  // ✅ allow single admin fetch
+                .requestMatchers("/api/admins/**").permitAll()    // ✅ allow delete & get single admin
+
 
                 // Protect everything else (requires valid JWT)
                 .anyRequest().authenticated()

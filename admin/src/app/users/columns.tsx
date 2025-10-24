@@ -22,7 +22,7 @@ export type User = {
   fullName: string;
   email: string;
   status: "active" | "inactive";
-   role: "admin" | "user";
+  role: "admin" | "user";
 };
 
 export const columns: ColumnDef<User>[] = [
@@ -67,24 +67,21 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Email
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
       const status = row.getValue("status");
-
       return (
         <div
           className={cn(
@@ -120,20 +117,17 @@ export const columns: ColumnDef<User>[] = [
       const user = row.original;
 
       const handleDeleteSingle = async () => {
-        if (!confirm(`Delete user ${user.fullName}?`)) return;
+        if (!confirm(`Are you sure you want to delete user "${user.fullName}"?`)) return;
         try {
-          const res = await fetch("http://localhost:8080/api/admin/delete", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ids: [user.id] }),
+          const res = await fetch(`http://localhost:8080/api/users/${user.id}`, {
+            method: "DELETE",
           });
-
-          if (!res.ok) throw new Error("delete failed");
-          alert("User deleted");
+          if (!res.ok) throw new Error("Delete failed");
+          alert("✅ User deleted successfully!");
           window.location.reload();
         } catch (err) {
           console.error(err);
-          alert("Failed to delete user");
+          alert("❌ Failed to delete user");
         }
       };
 
@@ -141,20 +135,21 @@ export const columns: ColumnDef<User>[] = [
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id)}>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id)}>
               Copy user ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={`/users/${user.id}`}>View customer</Link>
+              <Link href={`/users/${user.id}`}>View User</Link>
             </DropdownMenuItem>
-             <DropdownMenuItem onClick={handleDeleteSingle}>Delete user</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDeleteSingle}>
+              Delete user
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
