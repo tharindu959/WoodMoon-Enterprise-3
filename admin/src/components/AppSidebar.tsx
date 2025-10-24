@@ -10,6 +10,7 @@ import {
   Shirt,
   User,
   ShoppingBasket,
+  ShieldCheck, // ✅ Admin icon
 } from "lucide-react";
 import {
   Sidebar,
@@ -36,7 +37,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Sheet, SheetTrigger } from "./ui/sheet";
 import AddOrder from "./AddOrder";
-import AddAdmin from "./AddAdmin"; // ✅ Using AddAdmin form instead of AddUser
+import AddAdmin from "./AddAdmin";
 import AddCategory from "./AddCategory";
 import AddProduct from "./AddProduct";
 
@@ -69,7 +70,7 @@ const AppSidebar = () => {
 
       {/* Sidebar Content */}
       <SidebarContent>
-        {/* Application Group */}
+        {/* ----------------- APPLICATION GROUP ----------------- */}
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -91,7 +92,7 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Products Group */}
+        {/* ----------------- PRODUCTS GROUP ----------------- */}
         <SidebarGroup>
           <SidebarGroupLabel>Products</SidebarGroupLabel>
           <SidebarGroupAction>
@@ -145,15 +146,12 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Users Group (✅ keep as "Users") */}
+        {/* ----------------- USERS GROUP ----------------- */}
         <SidebarGroup>
           <SidebarGroupLabel>Users</SidebarGroupLabel>
-          <SidebarGroupAction>
-            <Plus /> <span className="sr-only">Add Admin</span>
-          </SidebarGroupAction>
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* View All Users */}
+              {/* ✅ Only show "See All Users" */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/users">
@@ -162,8 +160,29 @@ const AppSidebar = () => {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-              {/* Add User → Actually Adds Admin */}
+        {/* ----------------- ADMINS GROUP ✅ ----------------- */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Admins</SidebarGroupLabel>
+          <SidebarGroupAction>
+            <Plus /> <span className="sr-only">Add Admin</span>
+          </SidebarGroupAction>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {/* See All Admins */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/admins">
+                    <ShieldCheck />
+                    See All Admins
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Add Admin */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Sheet>
@@ -171,11 +190,11 @@ const AppSidebar = () => {
                       <SidebarMenuButton asChild>
                         <Link href="#">
                           <Plus />
-                          Add Admin
+                          Add New Admin
                         </Link>
                       </SidebarMenuButton>
                     </SheetTrigger>
-                    <AddAdmin /> {/* ✅ Replaced AddUser with AddAdmin */}
+                    <AddAdmin />
                   </Sheet>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -183,7 +202,7 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Orders / Payments */}
+        {/* ----------------- ORDERS / PAYMENTS ----------------- */}
         <SidebarGroup>
           <SidebarGroupLabel>Orders / Payments</SidebarGroupLabel>
           <SidebarGroupAction>
@@ -221,7 +240,7 @@ const AppSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Footer */}
+      {/* ----------------- FOOTER ----------------- */}
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -233,7 +252,7 @@ const AppSidebar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>Account</DropdownMenuItem>
-                <DropdownMenuItem>Setting</DropdownMenuItem>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuItem>Sign out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
