@@ -22,52 +22,59 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
 const formSchema = z.object({
-  fullName: z
+  firstName: z
     .string()
-    .min(2, { message: "Full name must be at least 2 characters!" })
+    .min(2, { message: "First name must be at least 2 characters!" })
     .max(50),
-     email: z.string().email({ message: "Invalid email address!" }),
-     phone: z.string().min(0).max(15).optional(),
-  address: z.string().min(0).optional(),
-  city: z.string().min(0).optional(),
-  role: z.enum(["admin", "user"]),
+  lastName: z
+    .string()
+    .min(2, { message: "Last name must be at least 2 characters!" })
+    .max(50),
+  email: z.string().email({ message: "Invalid email address!" }),
+  phone: z.string().max(15).optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
 });
 
-const AddUser = () => {
+const AddAdmin = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { role: "user" }
   });
 
-   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      const adminData = { ...values, role: "admin" };
+
       const res = await fetch("http://localhost:8080/api/admin/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(adminData),
       });
 
-      if (!res.ok) throw new Error("Failed to create user");
-      alert("User created successfully!");
+      if (!res.ok) throw new Error("Failed to create admin");
+      alert("Admin created successfully!");
       window.location.reload();
     } catch (err) {
       console.error(err);
-      alert("Error creating user");
+      alert("Error creating admin");
     }
   };
+
   return (
     <SheetContent>
       <SheetHeader>
-        <SheetTitle className="mb-4">Add User</SheetTitle>
+        <SheetTitle className="mb-4">Add Admin</SheetTitle>
         <SheetDescription asChild>
           <Form {...form}>
-             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              
+              {/* First Name */}
               <FormField
                 control={form.control}
-                name="fullName"
+                name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>First Name</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -75,6 +82,23 @@ const AddUser = () => {
                   </FormItem>
                 )}
               />
+
+              {/* Last Name */}
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Email */}
               <FormField
                 control={form.control}
                 name="email"
@@ -84,13 +108,12 @@ const AddUser = () => {
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
-                    <FormDescription>
-                      Only admin can see your email.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {/* Phone */}
               <FormField
                 control={form.control}
                 name="phone"
@@ -100,10 +123,11 @@ const AddUser = () => {
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
-                     <FormDescription>Only admin can see your phone number (optional)</FormDescription>
                   </FormItem>
                 )}
               />
+
+              {/* Address */}
               <FormField
                 control={form.control}
                 name="address"
@@ -113,11 +137,13 @@ const AddUser = () => {
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
-                    <FormDescription>Enter user address (optional)</FormDescription>
+                    <FormDescription>Enter admin address</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {/* City */}
               <FormField
                 control={form.control}
                 name="city"
@@ -127,30 +153,13 @@ const AddUser = () => {
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
-                     <FormDescription>Enter user city (optional)</FormDescription>
+                    <FormDescription>Enter admin city</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role</FormLabel>
-                    <FormControl>
-                      <select {...field} className="w-full rounded-md border px-2 py-1">
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                      </select>
-                    </FormControl>
-                    <FormDescription>Select user type</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit">Submit</Button>
+              <Button type="submit">Add Admin</Button>
             </form>
           </Form>
         </SheetDescription>
@@ -159,4 +168,4 @@ const AddUser = () => {
   );
 };
 
-export default AddUser;
+export default AddAdmin;

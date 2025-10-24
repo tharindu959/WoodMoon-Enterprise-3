@@ -28,56 +28,62 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
 
     public SecurityConfig(
-        JwtAuthenticationFilter jwtAuthenticationFilter,
-        @Lazy CustomUserDetailsService customUserDetailsService) {
-    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    this.customUserDetailsService = customUserDetailsService;
-}
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            @Lazy CustomUserDetailsService customUserDetailsService
+    ) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.customUserDetailsService = customUserDetailsService;
+    }
 
+    // ✅ Main Security Configuration
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // ✅ Enable CORS & disable CSRF for API use
+            // ✅ Enable CORS and disable CSRF
             .cors().and()
             .csrf(csrf -> csrf.disable())
 
-            // ✅ Define public and secured endpoints
+            // ✅ Define public and protected routes
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // allow login/signup
-                .anyRequest().authenticated() // protect all other routes
+                .requestMatchers("/api/auth/**").permitAll()   // Allow login/signup
+                .requestMatchers("/api/users/all").permitAll() // ✅ Allow fetching all users (for admin board)
+                .anyRequest().authenticated()                  // Protect all other routes
             )
 
-            // ✅ Stateless JWT-based authentication
-            .sessionManagement(session -> 
+            // ✅ Use stateless session (JWT-based)
+            .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            // ✅ Add JWT filter before authentication
+            // ✅ Add JWT filter before UsernamePasswordAuthenticationFilter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ✅ Expose AuthenticationManager Bean
+    // ✅ Authentication Manager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
-    // ✅ Password hashing
+    // ✅ Password Encoder (for hashing)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ Allow frontend (Next.js) requests
+    // ✅ CORS Configuration (allow both client and admin frontends)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // your Next.js client URL
+        configuration.setAllowedOrigins(List.of(
+            "http://localhost:3000", // client frontend
+            "http://localhost:3001"  // admin frontend
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true); // allow cookies if needed
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
