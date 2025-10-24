@@ -1,61 +1,55 @@
-package com.ecommerce.ecommercebackend.controller;
+package com.ecommerce.ecommercebackend.security;
 
-import com.ecommerce.ecommercebackend.model.User;
-import com.ecommerce.ecommercebackend.payload.RegisterRequest;
-import com.ecommerce.ecommercebackend.repository.UserRepository;
-import com.ecommerce.ecommercebackend.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import com.ecommerce.ecommercebackend.service.CustomUserDetailsService;
+import com.ecommerce.ecommercebackend.service.JwtService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.*;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.util.Optional;
+import java.io.IOException;
 
-@RestController
-@RequestMapping("/admin")
-public class AdminController {
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final JwtService jwtService;
+    private final CustomUserDetailsService userDetailsService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AuthService authService;
-
-    // Create a new admin
-    @PostMapping("/create")
-    public ResponseEntity<?> createAdmin(@RequestBody RegisterRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Email already exists.");
-        }
-
-        User admin = new User();
-        admin.setEmail(request.getEmail());
-        admin.setPassword(passwordEncoder.encode(request.getPassword()));
-        admin.setFirstName(request.getFirstName());
-        admin.setLastName(request.getLastName());
-        admin.setAddress(request.getAddress());
-        admin.setPhone(request.getPhone());
-        // You can add a "role" field if you want to distinguish admins
-        // admin.setRole("ADMIN");
-
-        userRepository.save(admin);
-        return ResponseEntity.status(HttpStatus.CREATED).body(admin);
+    public JwtAuthenticationFilter(JwtService jwtService, @Lazy CustomUserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
     }
 
-    // Delete a user by ID
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        Optional<User> userOpt = userRepository.findById(id);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        userRepository.deleteById(id);
-        return ResponseEntity.ok("User deleted successfully.");
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
+
+        filterChain.doFilter(request, response);
     }
 }
