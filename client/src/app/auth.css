@@ -1,0 +1,97 @@
+/* === Auth Page Styling (Clean White Background) === */
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #ffffff; /* match your main site background */
+  padding: 40px 20px;
+}
+
+/* Simplified form layout */
+.auth-form {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Headings */
+.auth-form h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #111827;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+/* Inputs */
+.auth-form input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-size: 15px;
+  color: #111827;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.auth-form input:focus {
+  border-color: #0070f3;
+  box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.15);
+}
+
+/* Blue buttons */
+.auth-form button {
+  width: 100%;
+  background-color: #0070f3;
+  color: #ffffff;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.auth-form button:hover {
+  background-color: #0059c9;
+  transform: scale(1.02);
+}
+
+/* Text and links */
+.auth-form p {
+  text-align: center;
+  font-size: 14px;
+  color: #4b5563;
+  margin-top: 10px;
+}
+
+.auth-form a {
+  color: #0070f3;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-form a:hover {
+  text-decoration: underline;
+}
+
+/* Name input row (for register page) */
+.name-row {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .auth-form {
+    max-width: 90%;
+  }
+
+  .auth-form h2 {
+    font-size: 1.5rem;
+  }
+}
