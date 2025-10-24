@@ -1,37 +1,41 @@
+"use client";
+
 import { User, columns } from "./columns";
 import { DataTable } from "./data-table";
 
 const getData = async (): Promise<User[]> => {
-  return [
-    {
-      id: "728ed521",
-      avatar: "/users/1.png",
-      status: "active",
-      fullName: "John Doe",
-      email: "johndoe@gmail.com",
-      role: "admin",
-    },
-    {
-      id: "728ed522",
-      avatar: "/users/2.png",
-      status: "active",
-      fullName: "Jane Doe",
-      email: "janedoe@gmail.com",
-       role: "user",
-    },
-    {
-      id: "728ed523",
-      avatar: "/users/3.png",
-      status: "inactive",
-      fullName: "Mike Galloway",
-      email: "mikegalloway@gmail.com",
-      role: "user",
-    },
-  ];
+  try {
+    // ✅ Fetch data from your Spring Boot backend
+    const res = await fetch("http://localhost:8080/api/users/all", {
+      cache: "no-store", // always get latest data
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch users");
+    }
+
+    const data = await res.json();
+
+    // ✅ Transform backend users to match your User type
+    const formattedUsers: User[] = data.map((user: any) => ({
+      id: String(user.id),
+      avatar: "/users/default.png", // default avatar (optional)
+      fullName: `${user.firstName} ${user.lastName}`,
+      email: user.email,
+      status: "active", // or decide from your DB field if available
+      role: "user", // backend can later send actual roles
+    }));
+
+    return formattedUsers;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return []; // return empty list on error
+  }
 };
 
 const UsersPage = async () => {
   const data = await getData();
+
   return (
     <div className="">
       <div className="mb-8 px-4 py-2 bg-secondary rounded-md">
