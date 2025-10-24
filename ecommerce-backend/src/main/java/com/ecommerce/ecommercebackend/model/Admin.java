@@ -1,21 +1,22 @@
 package com.ecommerce.ecommercebackend.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 
-@Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Table(name = "admin")
+@Entity
+@Table(name = "admins")
 public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String fullName;
     private String email;
+    private String phone;
+    private String address;
+    private String city;
     private String password;
-    private String role;
+    private String role = "ADMIN"; // ✅ ensure every admin has this
 }

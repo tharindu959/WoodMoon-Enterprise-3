@@ -43,11 +43,18 @@ public class SecurityConfig {
             .cors().and()
             .csrf(csrf -> csrf.disable())
 
-            // ✅ Define public and protected routes
+            // ✅ Define which endpoints are public or protected
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()   // Allow login/signup
-                .requestMatchers("/api/users/all").permitAll() // ✅ Allow fetching all users (for admin board)
-                .anyRequest().authenticated()                  // Protect all other routes
+                // Public endpoints (no JWT required)
+                .requestMatchers("/api/auth/**").permitAll()    // Login/signup
+                .requestMatchers("/api/users/all").permitAll()  // Allow fetching all users
+                .requestMatchers("/api/admins/all").permitAll() // ✅ Allow fetching all admins for admin dashboard
+
+                // Optional: Allow admin creation for setup (disable in production)
+                .requestMatchers("/api/admins/create").permitAll()
+
+                // Protect everything else (requires valid JWT)
+                .anyRequest().authenticated()
             )
 
             // ✅ Use stateless session (JWT-based)
@@ -73,13 +80,13 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ CORS Configuration (allow both client and admin frontends)
+    // ✅ CORS Configuration (allow both client + admin panels)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000", // client frontend
-            "http://localhost:3001"  // admin frontend
+            "http://localhost:3000", // Client frontend
+            "http://localhost:3001"  // Admin frontend
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
