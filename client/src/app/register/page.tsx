@@ -9,18 +9,36 @@ export default function RegisterPage() {
     lastName: "",
     email: "",
     phone: "",
-    address1: "",
-    address2: "",
+    address: "",
     password: "",
   });
+  const [message, setMessage] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(form);
+    setMessage("Registering...");
+
+    try {
+      const response = await fetch("http://localhost:8080/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (response.ok) {
+        setMessage("✅ Account created successfully! You can now login.");
+      } else {
+        const errText = await response.text();
+        setMessage(`❌ Registration failed: ${errText}`);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setMessage("❌ Server not responding. Try again later.");
+    }
   };
 
   return (
@@ -60,17 +78,11 @@ export default function RegisterPage() {
           required
         />
         <input
-          name="address1"
+          name="address"
           type="text"
-          placeholder="Address Line 1"
+          placeholder="Address"
           onChange={handleChange}
           required
-        />
-        <input
-          name="address2"
-          type="text"
-          placeholder="Address Line 2"
-          onChange={handleChange}
         />
         <input
           name="password"
@@ -81,6 +93,7 @@ export default function RegisterPage() {
         />
 
         <button type="submit">Register</button>
+        {message && <p>{message}</p>}
 
         <p>
           Already have an account? <Link href="/login">Login</Link>
