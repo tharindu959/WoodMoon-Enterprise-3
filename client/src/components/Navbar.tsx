@@ -20,6 +20,17 @@ const Navbar = () => {
           WoodMoon.
         </p>
       </Link>
+
+      {/* CENTER - Service Links */}
+      <div className="hidden md:flex items-center gap-6">
+        <Link href="/services" className="text-gray-600 hover:text-blue-600 transition-colors">
+          Browse Services
+        </Link>
+        <Link href="/request-service" className="text-gray-600 hover:text-blue-600 transition-colors">
+          Request Service
+        </Link>
+      </div>
+
       {/* RIGHT */}
       <div className="flex items-center gap-6">
         <SearchBar />
