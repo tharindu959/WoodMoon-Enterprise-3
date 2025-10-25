@@ -35,10 +35,14 @@ const Navbar = () => {
       <div className="flex items-center gap-6">
         <SearchBar />
         <Link href="/">
-          <Home className="w-4 h-4 text-gray-600"/>
+          <Home className="w-4 h-4 text-gray-600" />
         </Link>
-        <Bell className="w-4 h-4 text-gray-600"/>
-        <ShoppingCartIcon/>
+        <Bell className="w-4 h-4 text-gray-600" />
+        <ShoppingCartIcon />
+        {/* ✅ Added Contact Us link here */}
+        <Link href="/contact" className="text-gray-700 hover:text-blue-600">
+          Contact Us
+        </Link>
         <Link href="/login">Sign in</Link>
       </div>
     </nav>
