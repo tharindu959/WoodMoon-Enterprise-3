@@ -16,16 +16,16 @@ import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-export type User = {
+export type Admin = {
   id: string;
   avatar: string;
   fullName: string;
   email: string;
   status: "active" | "inactive";
-  role: "admin" | "user";
+  role: "admin";
 };
 
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<Admin>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -48,12 +48,12 @@ export const columns: ColumnDef<User>[] = [
     accessorKey: "avatar",
     header: "Avatar",
     cell: ({ row }) => {
-      const user = row.original;
+      const admin = row.original;
       return (
         <div className="w-9 h-9 relative">
           <Image
-            src={user.avatar}
-            alt={user.fullName}
+            src={admin.avatar}
+            alt={admin.fullName}
             fill
             className="rounded-full object-cover"
           />
@@ -63,7 +63,7 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "fullName",
-    header: "User",
+    header: "Admin",
   },
   {
     accessorKey: "email",
@@ -98,36 +98,29 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "role",
     header: "Role",
-    cell: ({ row }) => {
-      const role = row.getValue("role");
-      return (
-        <span
-          className={`px-2 py-1 rounded text-xs ${
-            role === "admin" ? "bg-blue-500/30" : "bg-gray-500/30"
-          }`}
-        >
-          {role as string}
-        </span>
-      );
-    },
+    cell: () => (
+      <span className="px-2 py-1 rounded text-xs bg-blue-500/30">admin</span>
+    ),
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const user = row.original;
+      const admin = row.original;
 
       const handleDeleteSingle = async () => {
-        if (!confirm(`Are you sure you want to delete user "${user.fullName}"?`)) return;
+        if (!confirm(`Are you sure you want to delete admin "${admin.fullName}"?`)) return;
         try {
-          const res = await fetch(`http://localhost:8080/api/users/${user.id}`, {
+          const res = await fetch(`http://localhost:8080/api/admins/${admin.id}`, {
             method: "DELETE",
           });
-          if (!res.ok) throw new Error("Delete failed");
-          alert("✅ User deleted successfully!");
+
+          if (!res.ok) throw new Error("Failed to delete admin");
+
+          alert("✅ Admin deleted successfully!");
           window.location.reload();
         } catch (err) {
-          console.error(err);
-          alert("❌ Failed to delete user");
+          console.error("Error deleting admin:", err);
+          alert("❌ Failed to delete admin");
         }
       };
 
@@ -140,15 +133,17 @@ export const columns: ColumnDef<User>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id)}>
-              Copy user ID
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(admin.id)}
+            >
+              Copy admin ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={`/users/${user.id}`}>View User</Link>
+              <Link href={`/admins/${admin.id}`}>View Admin</Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleDeleteSingle}>
-              Delete user
+              Delete admin
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

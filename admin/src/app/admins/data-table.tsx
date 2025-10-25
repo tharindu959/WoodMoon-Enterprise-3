@@ -51,21 +51,21 @@ export function DataTable<TData, TValue>({
 
   const handleDelete = async () => {
     if (selectedIds.length === 0) return;
-    if (!confirm(`Delete ${selectedIds.length} user(s)?`)) return;
+    if (!confirm(`Are you sure you want to delete ${selectedIds.length} admin(s)?`)) return;
 
     try {
       for (const id of selectedIds) {
-        const res = await fetch(`http://localhost:8080/api/users/${id}`, {
+        const res = await fetch(`http://localhost:8080/api/admins/${id}`, {
           method: "DELETE",
         });
-        if (!res.ok) throw new Error(`Failed to delete user with ID: ${id}`);
+        if (!res.ok) throw new Error(`Failed to delete admin with ID ${id}`);
       }
 
-      alert("✅ Selected user(s) deleted successfully!");
+      alert("✅ Selected admin(s) deleted successfully!");
       window.location.reload();
     } catch (err) {
-      console.error("Error deleting users:", err);
-      alert("❌ Failed to delete selected users");
+      console.error("Error deleting admins:", err);
+      alert("❌ Failed to delete selected admins");
     }
   };
 
@@ -78,7 +78,7 @@ export function DataTable<TData, TValue>({
             className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer hover:bg-red-600"
           >
             <Trash2 className="w-4 h-4" />
-            Delete User(s)
+            Delete Admin(s)
           </button>
         </div>
       )}
