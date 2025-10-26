@@ -37,6 +37,18 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
     }
 
+    // ✅ MAIN SECURITY CONFIGURATION
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // Enable CORS (for frontend & admin dashboards)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // Disable CSRF (we use JWT, not cookies)
+            .csrf(csrf -> csrf.disable())
+
+            // Authorization configuration
+            .authorizeHttpRequests(auth -> auth
+                // Public endpoints (no authentication)
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -49,6 +61,21 @@ public class SecurityConfig {
                 .requestMatchers("/api/admins/create").permitAll()
                 .requestMatchers("/api/admins/{id}").permitAll()
                 .requestMatchers("/api/admins/**").permitAll()
+                .requestMatchers("/api/products/**").permitAll()
+                .requestMatchers("/api/categories/**").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+
+                // ✅ Require authentication for protected routes
+                .requestMatchers("/api/cart/**").authenticated()
+                .anyRequest().permitAll()
+            )
+
+            // Stateless session management for JWT
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+
+            // Add JWT Authentication Filter before username-password filter
 
                 // ✅ Fix Contact Us and Messages page
                 .requestMatchers("/api/contact/**").permitAll()
@@ -79,6 +106,13 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
+                "http://localhost:3000",  // Frontend
+                "http://localhost:3001"   // Admin panel
+        ));
+
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        configuration.setExposedHeaders(List.of("Authorization"));
             "http://localhost:3000", // client
             "http://localhost:3001"  // admin
         ));
@@ -91,7 +125,7 @@ public class SecurityConfig {
         return source;
     }
 
-    // ✅ Optional Global CORS Configurer (extra safety)
+    // ✅ Optional: Global CORS Configurer (extra safety for API routes)
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -100,6 +134,7 @@ public class SecurityConfig {
                 registry.addMapping("/api/**")
                         .allowedOrigins("http://localhost:3000", "http://localhost:3001")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
                         .allowCredentials(true);
             }
         };

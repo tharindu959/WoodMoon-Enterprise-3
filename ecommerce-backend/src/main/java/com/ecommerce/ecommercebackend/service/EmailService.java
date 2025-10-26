@@ -31,6 +31,7 @@ public class EmailService {
         mailSender.send(mail);
     }
 }
+}
     @Autowired(required = false)
     private JavaMailSender mailSender;
 
