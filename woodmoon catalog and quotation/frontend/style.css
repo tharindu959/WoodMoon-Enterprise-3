@@ -1,0 +1,297 @@
+/* style.css */
+
+/* Body background and font */
+body {
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Container styling */
+.container {
+    max-width: 500px;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(255, 87, 34, 0.15);
+    padding: 40px 35px;
+    border: 1px solid #ffccbc;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add decorative elements */
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff5722, #ff9800, #ff5722);
+}
+
+/* Form title */
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: #e65100;
+    font-size: 2.2em;
+    text-shadow: 0 2px 4px rgba(230, 81, 0, 0.1);
+    position: relative;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #ff5722, #ff9800);
+    border-radius: 2px;
+}
+
+/* Input fields */
+.form-control {
+    border-radius: 12px;
+    border: 2px solid #ffe0b2;
+    padding: 15px 20px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: #fffaf0;
+    box-shadow: inset 0 2px 4px rgba(255, 152, 0, 0.1);
+}
+
+/* Input focus effect */
+.form-control:focus {
+    border-color: #ff9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2),
+                inset 0 2px 4px rgba(255, 152, 0, 0.1);
+    background: #fff;
+    transform: translateY(-2px);
+}
+
+/* Labels */
+label {
+    font-weight: 600;
+    color: #bf360c;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Submit button */
+.btn-primary {
+    width: 100%;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    border: none;
+    padding: 16px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+    position: relative;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+/* Hover effect for button */
+.btn-primary:hover {
+    background: linear-gradient(135deg, #f4511e, #fb8c00);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 87, 34, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+}
+
+/* Textarea adjustment */
+textarea.form-control {
+    resize: none;
+    min-height: 120px;
+}
+
+/* Toggle switch - Orange Theme */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-left: 15px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    background-color: #ffccbc;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: .4s;
+    border-radius: 34px;
+    box-shadow: inset 0 2px 4px rgba(191, 54, 12, 0.2);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background: linear-gradient(135deg, #ffffff, #f5f5f5);
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .slider {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+    box-shadow: 0 2px 4px rgba(191, 54, 12, 0.3);
+}
+
+/* Form group enhancements */
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+/* Add icons or decorative elements to form groups */
+.form-group::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #ffccbc, transparent);
+}
+
+/* Focus states for accessibility */
+.form-control:focus,
+.btn-primary:focus,
+.switch input:focus + .slider {
+    outline: none;
+}
+
+/* Animation for form elements */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-group {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.1s; }
+.form-group:nth-child(2) { animation-delay: 0.2s; }
+.form-group:nth-child(3) { animation-delay: 0.3s; }
+.form-group:nth-child(4) { animation-delay: 0.4s; }
+
+/* Responsive design */
+@media (max-width: 576px) {
+    .container {
+        margin: 10px;
+        padding: 30px 25px;
+    }
+
+    h2 {
+        font-size: 1.8em;
+    }
+
+    .form-control {
+        padding: 12px 15px;
+    }
+}
+
+/* Custom scrollbar for textarea */
+textarea.form-control::-webkit-scrollbar {
+    width: 8px;
+}
+
+textarea.form-control::-webkit-scrollbar-track {
+    background: #fff3e0;
+    border-radius: 4px;
+}
+
+textarea.form-control::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    border-radius: 4px;
+}
+
+textarea.form-control::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #f57c00, #e64a19);
+}
+
+/* Toggle label styling */
+.toggle-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    color: #bf360c;
+    font-weight: 600;
+}
+
+/* Success message styling */
+.alert-success {
+    background: linear-gradient(135deg, #a5d6a7, #81c784);
+    border: none;
+    border-radius: 12px;
+    color: #1b5e20;
+    font-weight: 500;
+}
+
+/* Error message styling */
+.alert-danger {
+    background: linear-gradient(135deg, #ef9a9a, #e57373);
+    border: none;
+    border-radius: 12px;
+    color: #b71c1c;
+    font-weight: 500;
+}

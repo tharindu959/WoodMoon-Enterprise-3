@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woodmoon Enterprises - Product Catalog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Header Styles */
+        .main-header {
+            background: linear-gradient(135deg, #ff5722 0%, #e65100 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(255, 87, 34, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="rgba(255,255,255,0.1)"><polygon points="50,0 100,50 50,100 0,50"/></svg>');
+            background-size: 60px 60px;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-60px) rotate(360deg); }
+        }
+
+        .company-name {
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            letter-spacing: 1.5px;
+        }
+
+        .company-tagline {
+            font-size: 1.1em;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .header-decoration {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .decoration-dot {
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .decoration-dot:nth-child(2) { animation-delay: 0.5s; }
+        .decoration-dot:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
+
+        /* Container Styles */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .page-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #e65100;
+            margin-bottom: 12px;
+            text-shadow: 2px 2px 4px rgba(230, 81, 0, 0.1);
+        }
+
+        .page-subtitle {
+            font-size: 1.1em;
+            color: #bf360c;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* Products Grid - Smaller boxes */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 15px 0;
+        }
+
+        .product-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fff8e1 100%);
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.15);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff5722, #ff9800, #ff5722);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(255, 152, 0, 0.25);
+            border-color: #ff9800;
+        }
+
+        .product-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .product-image-container {
+            position: relative;
+            overflow: hidden;
+            height: 180px;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.08);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #ff5722, #ff9800);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(255, 87, 34, 0.3);
+        }
+
+        .product-info {
+            padding: 20px;
+            position: relative;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #e65100;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-description {
+            color: #bf360c;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            font-weight: 400;
+            font-size: 0.9em;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-price {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #ff5722;
+            text-align: right;
+            background: linear-gradient(135deg, #fff3e0, #ffecb3);
+            padding: 8px 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 3px 10px rgba(255, 152, 0, 0.1);
+        }
+
+        /* No Products State */
+        .no-products {
+            text-align: center;
+            padding: 60px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .no-products-icon {
+            font-size: 3em;
+            color: #ffccbc;
+            margin-bottom: 15px;
+        }
+
+        .no-products h3 {
+            color: #e65100;
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+
+        .no-products p {
+            color: #bf360c;
+            font-size: 1em;
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 50px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #ffe0b2;
+            border-top: 3px solid #ff5722;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #e65100 0%, #bf360c 100%);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .footer h3 {
+            font-size: 1.3em;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .footer p {
+            opacity: 0.9;
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .company-name {
+                font-size: 2.2em;
+            }
+
+            .page-title {
+                font-size: 1.8em;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+
+            .product-card {
+                margin: 0 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .company-name {
+                font-size: 1.8em;
+            }
+
+            .page-title {
+                font-size: 1.5em;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .product-info {
+                padding: 15px;
+            }
+
+            .product-image-container {
+                height: 160px;
+            }
+        }
+
+        /* Animation for product cards */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-card {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .product-card:nth-child(1) { animation-delay: 0.1s; }
+        .product-card:nth-child(2) { animation-delay: 0.2s; }
+        .product-card:nth-child(3) { animation-delay: 0.3s; }
+        .product-card:nth-child(4) { animation-delay: 0.4s; }
+        .product-card:nth-child(5) { animation-delay: 0.5s; }
+        .product-card:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+<!-- Main Header -->
+<header class="main-header">
+    <div class="header-content">
+        <h1 class="company-name">Woodmoon Enterprises</h1>
+        <p class="company-tagline">Premium Timber & Wood Supplies Since 1995</p>
+        <div class="header-decoration">
+            <div class="decoration-dot"></div>
+            <div class="decoration-dot"></div>
+            <div class="decoration-dot"></div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="container">
+    <div class="page-header">
+        <h2 class="page-title">Our Timber Collection</h2>
+        <p class="page-subtitle">Discover quality raw timber including Mahogany, Teak, Jackwood, and other premium wood varieties</p>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading our timber collection...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <h3>Woodmoon Enterprises</h3>
+        <p>Quality Timber & Wood Supply Solutions</p>
+        <p>📍 776 Panagoda,Homagama | 📞 0112 748117</p>
+    </div>
+</footer>
+
+<script>
+    const API_BASE = 'http://localhost:8080/api';
+
+    async function loadProducts() {
+        const productsGrid = document.getElementById('productsGrid');
+
+        try {
+            const response = await fetch(API_BASE + '/products');
+            const products = await response.json();
+
+            productsGrid.innerHTML = '';
+
+            if (products.length === 0) {
+                productsGrid.innerHTML = `
+                    <div class="no-products">
+                        <div class="no-products-icon">🪵</div>
+                        <h3>No Timber Available</h3>
+                        <p>We're currently updating our inventory. Please check back soon!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            products.forEach((product, index) => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.style.animationDelay = `${(index % 6) * 0.1}s`;
+
+                productCard.innerHTML = `
+                    <div class="product-image-container">
+                        <img src="${product.productImageUrl}" alt="${product.productName}" class="product-image"
+                             onerror="this.src='https://images.unsplash.com/photo-1598880940080-ff0dc34cfdd8?w=300&h=200&fit=crop'">
+                        <div class="product-badge">Timber</div>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">${product.productName}</h3>
+                        <p class="product-description">${product.productDescription}</p>
+                        <div class="product-price">Rs. ${parseFloat(product.productPrice).toFixed(2)}</div>
+                    </div>
+                `;
+
+                productsGrid.appendChild(productCard);
+            });
+        } catch (error) {
+            console.error('Error loading products:', error);
+            productsGrid.innerHTML = `
+                <div class="no-products">
+                    <div class="no-products-icon">⚠️</div>
+                    <h3>Connection Issue</h3>
+                    <p>We're having trouble loading our products. Please refresh the page or try again later.</p>
+                </div>
+            `;
+        }
+    }
+
+    // Load products when page loads
+    document.addEventListener('DOMContentLoaded', loadProducts);
+
+    // Auto-refresh every 30 seconds to show new products
+    setInterval(loadProducts, 30000);
+</script>
+</body>
+</html>
