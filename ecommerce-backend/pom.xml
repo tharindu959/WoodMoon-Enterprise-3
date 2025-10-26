@@ -3,6 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -17,6 +18,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>ECommerce Backend</name>
     <description>Spring Boot backend for E-commerce platform (merged with Woodmoon features)</description>
+    <description>Spring Boot backend for E-commerce platform</description>
 
     <properties>
         <java.version>17</java.version>
@@ -25,6 +27,7 @@
 
     <dependencies>
         <!-- ✅ Core Spring Boot Starters -->
+        <!-- ✅ Spring Boot Core Starters -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -41,6 +44,7 @@
         </dependency>
 
         <!-- ✅ MySQL Connector -->
+        <!-- ✅ Database Connector -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
@@ -54,6 +58,8 @@
         </dependency>
 
         <!-- ✅ Lombok (Boilerplate reduction) -->
+        
+        <!-- ✅ Utilities and Developer Tools -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -69,16 +75,20 @@
         </dependency>
 
         <!-- ✅ JWT Authentication -->
+        
+        <!-- ✅ JWT Implementation -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
             <version>${jjwt.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
             <version>${jjwt.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
@@ -86,6 +96,7 @@
         </dependency>
 
         <!-- ✅ Testing -->
+        <!-- ✅ Testing Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -96,6 +107,19 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- ✅ ADDED: Spring Boot Starter Mail (for EmailService.java) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!-- ✅ ADDED: Jakarta Persistence API (ensures JPA annotations work cleanly) -->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>3.1.0</version>
         </dependency>
     </dependencies>
 
@@ -118,6 +142,7 @@
             </plugin>
 
             <!-- ✅ Skip Tests for faster development -->
+            <!-- ✅ Skip Tests Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -126,6 +151,7 @@
                 </configuration>
             </plugin>
 
+            
             <!-- ✅ Spring Boot Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -142,4 +168,5 @@
         </plugins>
     </build>
 
+</project>
 </project>
