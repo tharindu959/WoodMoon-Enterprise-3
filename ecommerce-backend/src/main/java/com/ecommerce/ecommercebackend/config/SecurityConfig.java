@@ -37,34 +37,36 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    // ✅ Main Security Configuration
+    // ✅ MAIN SECURITY CONFIGURATION
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // ✅ Enable CORS properly using our configurationSource
+            // Enable CORS (for frontend & admin dashboards)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            // ✅ Disable CSRF for REST APIs
+            // Disable CSRF (we use JWT, not cookies)
             .csrf(csrf -> csrf.disable())
 
-            // ✅ Authorization setup
+            // Authorization configuration
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints (no authentication required)
+                // Public endpoints (no authentication)
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/admins/**").permitAll()
                 .requestMatchers("/api/products/**").permitAll()
                 .requestMatchers("/api/categories/**").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                // ✅ Protect all other routes
-                .anyRequest().authenticated()
+
+                // ✅ Require authentication for protected routes
+                .requestMatchers("/api/cart/**").authenticated()
+                .anyRequest().permitAll()
             )
 
-            // ✅ Make sessions stateless (JWT-based)
+            // Stateless session management for JWT
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            // ✅ Add our JWT filter
+            // Add JWT Authentication Filter before username-password filter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -88,21 +90,21 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000",  // Client frontend
-                "http://localhost:3001"   // Admin dashboard
+                "http://localhost:3000",  // Frontend
+                "http://localhost:3001"   // Admin panel
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         configuration.setExposedHeaders(List.of("Authorization"));
-        configuration.setAllowCredentials(true); // ✅ Required for cookie/auth requests
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
-    // ✅ Optional Global CORS Configurer (extra safety)
+    // ✅ Optional: Global CORS Configurer (extra safety for API routes)
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -111,6 +113,7 @@ public class SecurityConfig {
                 registry.addMapping("/api/**")
                         .allowedOrigins("http://localhost:3000", "http://localhost:3001")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
                         .allowCredentials(true);
             }
         };
