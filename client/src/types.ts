@@ -3,13 +3,16 @@ import { z } from "zod";
 export type ProductType = {
   id: string | number;
   name: string;
-  shortDescription: string;
-  description: string;
+  shortDescription?: string;
+  description?: string;
   price: number;
-  sizes: string[];
-  colors: string[];
-  images: Record<string, string>;
+  sizes?: string[];
+  colors?: string[];
+  images?: Record<string, string>;
+  category?: string;
+  imageUrl?: string; // ✅ Added optional image URL
 };
+
 
 export type ProductsType = ProductType[];
 

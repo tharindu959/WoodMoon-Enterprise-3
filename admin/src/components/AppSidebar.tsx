@@ -10,7 +10,9 @@ import {
   Shirt,
   User,
   ShoppingBasket,
-  ShieldCheck, // ✅ Admin icon
+  ShieldCheck,
+  Wrench,
+  ClipboardList, // ✅ Added for Services section
 } from "lucide-react";
 import {
   Sidebar,
@@ -151,7 +153,6 @@ const AppSidebar = () => {
           <SidebarGroupLabel>Users</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* ✅ Only show "See All Users" */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/users">
@@ -164,7 +165,7 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* ----------------- ADMINS GROUP ✅ ----------------- */}
+        {/* ----------------- ADMINS GROUP ----------------- */}
         <SidebarGroup>
           <SidebarGroupLabel>Admins</SidebarGroupLabel>
           <SidebarGroupAction>
@@ -243,6 +244,38 @@ const AppSidebar = () => {
                     </SheetTrigger>
                     <AddOrder />
                   </Sheet>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* ----------------- SERVICES GROUP ✅ ----------------- */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Services</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link
+                    href="/services"
+                    className="text-gray-600 hover:text-blue-600 transition-colors"
+                  >
+                    <Wrench />
+                    Manage Services
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link
+                    href="/requests"
+                    className="text-gray-600 hover:text-blue-600 transition-colors"
+                  >
+                    <ClipboardList />
+                    View Requests
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

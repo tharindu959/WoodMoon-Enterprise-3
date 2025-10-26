@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
@@ -20,11 +19,12 @@ export type Product = {
   id: string | number;
   price: number;
   name: string;
-  shortDescription: string;
-  description: string;
-  sizes: string[];
-  colors: string[];
-  images: Record<string, string>;
+  shortDescription?: string;
+  description?: string;
+  category?: string;
+  imageUrl?: string; // ✅ optional image field for backend support
+  colors?: string[];
+  images?: Record<string, string>;
 };
 
 export const columns: ColumnDef<Product>[] = [
@@ -51,11 +51,19 @@ export const columns: ColumnDef<Product>[] = [
     header: "Image",
     cell: ({ row }) => {
       const product = row.original;
+
+      // ✅ Choose safe image source
+      const imageSrc =
+        product?.imageUrl ||
+        (product?.images && product?.colors && product?.colors[0]
+          ? product.images[product.colors[0]]
+          : "/placeholder.png"); // fallback image
+
       return (
         <div className="w-9 h-9 relative">
           <Image
-            src={product.images[product.colors[0]]}
-            alt={product.name}
+            src={imageSrc}
+            alt={product.name || "Product image"}
             fill
             className="rounded-full object-cover"
           />
@@ -84,6 +92,11 @@ export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: "shortDescription",
     header: "Description",
+    cell: ({ row }) => (
+      <span className="text-sm text-gray-600">
+        {row.original.shortDescription || row.original.description || "—"}
+      </span>
+    ),
   },
   {
     id: "actions",
@@ -101,13 +114,15 @@ export const columns: ColumnDef<Product>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(product.id.toString())}
+              onClick={() =>
+                navigator.clipboard.writeText(product.id.toString())
+              }
             >
               Copy product ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={`/products/${product.id}`}>View customer</Link>
+              <Link href={`/products/${product.id}`}>View details</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

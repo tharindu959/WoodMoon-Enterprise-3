@@ -1,129 +1,106 @@
+"use client";
+
+import "react-toastify/dist/ReactToastify.css";
+import { useEffect, useState } from "react";
 import { Product, columns } from "./columns";
 import { DataTable } from "./data-table";
+import { toast } from "react-toastify";
 
-const getData = async (): Promise<Product[]> => {
-  return [
-    {
-      id: 1,
-      name: "Akeshiya Timber",
-      shortDescription:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      description:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      price: 39.9,
-      sizes: ["s", "m", "l", "xl", "xxl"],
-      colors: ["gray", "purple", "green"],
-      images: {
-        gray: "/products/1g.png",
-        purple: "/products/1p.png",
-        green: "/products/1gr.png",
-      },
-    },
-    {
-      id: 2,
-      name: "Gandis Timber",
-      shortDescription:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      description:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      price: 59.9,
-      sizes: ["s", "m", "l", "xl"],
-      colors: ["gray", "green"],
-      images: { gray: "/products/2g.png", green: "/products/2gr.png" },
-    },
-    {
-      id: 3,
-      name: "Kolon Timber",
-      shortDescription:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      description:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      price: 69.9,
-      sizes: ["s", "m", "l"],
-      colors: ["green", "blue", "black"],
-      images: {
-        green: "/products/3gr.png",
-        blue: "/products/3b.png",
-        black: "/products/3bl.png",
-      },
-    },
-    {
-      id: 4,
-      name: "Albesia timber",
-      shortDescription:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      description:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      price: 29.9,
-      sizes: ["s", "m", "l"],
-      colors: ["white", "pink"],
-      images: { white: "/products/4w.png", pink: "/products/4p.png" },
-    },
-    {
-      id: 5,
-      name: "Burutha Timber",
-      shortDescription:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      description:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      price: 49.9,
-      sizes: ["s", "m", "l"],
-      colors: ["red", "orange", "black"],
-      images: {
-        red: "/products/5r.png",
-        orange: "/products/5o.png",
-        black: "/products/5bl.png",
-      },
-    },
-    {
-      id: 6,
-      name: "Coconut Timber",
-      shortDescription:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      description:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      price: 59.9,
-      sizes: ["40", "42", "43", "44"],
-      colors: ["gray", "white"],
-      images: { gray: "/products/6g.png", white: "/products/6w.png" },
-    },
-    {
-      id: 7,
-      name: "Jack Timber ",
-      shortDescription:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      description:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      price: 69.9,
-      sizes: ["40", "42", "43"],
-      colors: ["gray", "pink"],
-      images: { gray: "/products/7g.png", pink: "/products/7p.png" },
-    },
-    {
-      id: 8,
-      name: "Ketakela Timber",
-      shortDescription:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      description:
-        "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-      price: 59.9,
-      sizes: ["s", "m", "l"],
-      colors: ["blue", "green"],
-      images: { blue: "/products/8b.png", green: "/products/8gr.png" },
-    },
-  ];
-};
+const ProductsPage = () => {
+  const [data, setData] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
 
-const PaymentsPage = async () => {
-  const data = await getData();
+  // ✅ Fetch all products from backend
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+
+  const res = await fetch("http://localhost:8080/api/products", {
+  method: "GET", // or "POST"
+  headers: { "Content-Type": "application/json" },
+  mode: "cors",
+  credentials: "include",
+});
+
+
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch products. Status: ${res.status}`);
+      }
+
+      const text = await res.text();
+      const products = text ? JSON.parse(text) : [];
+
+      // Ensure all product IDs are numbers
+      const formatted = products.map((p: any) => ({
+        ...p,
+        id: Number(p.id),
+      }));
+
+      setData(formatted);
+    } catch (error) {
+      console.error("❌ Fetch error:", error);
+      toast.error("Error fetching products");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Delete selected products
+  const handleDeleteProducts = async (ids: number[]) => {
+    try {
+      if (ids.length === 0) return;
+
+      const confirmDelete = window.confirm(
+        `Are you sure you want to delete ${ids.length} product(s)?`
+      );
+      if (!confirmDelete) return;
+
+      for (const id of ids) {
+        const res = await fetch(`http://localhost:8080/api/products/${id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to delete product ID: ${id}`);
+        }
+      }
+
+      toast.success("Selected product(s) deleted successfully!");
+      fetchProducts();
+    } catch (error) {
+      console.error("❌ Delete error:", error);
+      toast.error("Error deleting product(s)");
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   return (
-    <div className="">
+    <div className="p-4">
+      {/* Header */}
       <div className="mb-8 px-4 py-2 bg-secondary rounded-md">
-        <h1 className="font-semibold">All Products</h1>
+        <h1 className="font-semibold text-lg">All Products</h1>
+        <p className="text-sm text-gray-500">
+          Manage, add, or delete wood products from here.
+        </p>
       </div>
-      <DataTable columns={columns} data={data} />
+
+      {/* Loading State */}
+      {loading ? (
+        <p className="text-center text-gray-500 mt-8">Loading products...</p>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={data}
+          onDelete={handleDeleteProducts}
+        />
+      )}
     </div>
   );
 };
 
-export default PaymentsPage;
+export default ProductsPage;

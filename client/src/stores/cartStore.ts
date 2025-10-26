@@ -1,12 +1,14 @@
-import { CartStoreActionsType, CartStoreStateType } from "@/types";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { CartStoreActionsType, CartStoreStateType } from "@/types";
+import useAuthStore from "./authStore";
 
 const useCartStore = create<CartStoreStateType & CartStoreActionsType>()(
   persist(
     (set) => ({
       cart: [],
       hasHydrated: false,
+
       addToCart: (product) =>
         set((state) => {
           const existingIndex = state.cart.findIndex(
@@ -34,6 +36,7 @@ const useCartStore = create<CartStoreStateType & CartStoreActionsType>()(
             ],
           };
         }),
+
       removeFromCart: (product) =>
         set((state) => ({
           cart: state.cart.filter(
@@ -45,18 +48,40 @@ const useCartStore = create<CartStoreStateType & CartStoreActionsType>()(
               )
           ),
         })),
+
       clearCart: () => set({ cart: [] }),
     }),
     {
-      name: "cart",
+      name: "cart", // this key will be dynamically modified
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.hasHydrated = true;
-        }
+        if (state) state.hasHydrated = true;
       },
     }
   )
 );
+
+// Custom hook to use per-user cart key
+export const useUserCart = () => {
+  const { user } = useAuthStore();
+  const store = useCartStore();
+
+  const key = user ? `cart_${user}` : "cart_guest";
+
+  // When user changes, migrate data if necessary
+  if (typeof window !== "undefined") {
+    const savedCart = localStorage.getItem(key);
+    if (savedCart && !store.hasHydrated) {
+      try {
+        const parsed = JSON.parse(savedCart);
+        if (parsed.state?.cart) {
+          store.cart = parsed.state.cart;
+        }
+      } catch {}
+    }
+  }
+
+  return store;
+};
 
 export default useCartStore;
