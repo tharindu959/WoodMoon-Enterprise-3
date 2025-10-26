@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
@@ -39,31 +41,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // ✅ Enable CORS and disable CSRF
-            .cors().and()
+            // ✅ Enable CORS properly using our configurationSource
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // ✅ Disable CSRF for REST APIs
             .csrf(csrf -> csrf.disable())
 
-            // ✅ Define which endpoints are public or protected
+            // ✅ Authorization setup
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints (no JWT required)
+                // Public endpoints (no authentication required)
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
-                .requestMatchers("/api/admins/all").permitAll()
-                .requestMatchers("/api/admins/create").permitAll()
-                .requestMatchers("/api/admins/{id}").permitAll()  // ✅ allow single admin fetch
-                .requestMatchers("/api/admins/**").permitAll()    // ✅ allow delete & get single admin
-
-
-                // Protect everything else (requires valid JWT)
+                .requestMatchers("/api/admins/**").permitAll()
+                .requestMatchers("/api/products/**").permitAll()
+                .requestMatchers("/api/categories/**").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                // ✅ Protect all other routes
                 .anyRequest().authenticated()
             )
 
-            // ✅ Use stateless session (JWT-based)
+            // ✅ Make sessions stateless (JWT-based)
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            // ✅ Add JWT filter before UsernamePasswordAuthenticationFilter
+            // ✅ Add our JWT filter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -75,26 +76,43 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-    // ✅ Password Encoder (for hashing)
+    // ✅ Password Encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ CORS Configuration (allow both client + admin panels)
+    // ✅ CORS Configuration (Frontend 3000 + Admin 3001)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000", // Client frontend
-            "http://localhost:3001"  // Admin frontend
+                "http://localhost:3000",  // Client frontend
+                "http://localhost:3001"   // Admin dashboard
         ));
+
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowCredentials(true); // ✅ Required for cookie/auth requests
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    // ✅ Optional Global CORS Configurer (extra safety)
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**")
+                        .allowedOrigins("http://localhost:3000", "http://localhost:3001")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowCredentials(true);
+            }
+        };
     }
 }
