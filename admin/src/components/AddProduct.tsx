@@ -1,5 +1,6 @@
 "use client";
 
+import "react-toastify/dist/ReactToastify.css";
 import {
   SheetContent,
   SheetDescription,
@@ -28,99 +29,154 @@ import {
 } from "@/components/ui/select";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
-import { Checkbox } from "./ui/checkbox";
 import { ScrollArea } from "./ui/scroll-area";
+import { toast } from "react-toastify";
+import { useState } from "react";
 
+// ✅ Categories specific to wood-related business
 const categories = [
-  "T-shirts",
-  "Shoes",
+  "Woods",
+  "Wood Products",
+  "Furniture",
+  "Panels",
+  "Flooring",
   "Accessories",
-  "Bags",
-  "Dresses",
-  "Jackets",
-  "Gloves",
 ] as const;
 
-const colors = [
-  "blue",
-  "green",
-  "red",
-  "yellow",
-  "purple",
-  "orange",
-  "pink",
-  "brown",
-  "gray",
-  "black",
-  "white",
+// ✅ Types of wood
+const woodTypes = [
+  "Teak",
+  "Mahogany",
+  "Burutha",
+  "Albesia",
+  "Akeshiya",
+  "Jack",
+  "Coconut",
+  "Kolon",
 ] as const;
 
-const sizes = [
-  "xs",
-  "s",
-  "m",
-  "l",
-  "xl",
-  "xxl",
-  "34",
-  "35",
-  "36",
-  "37",
-  "38",
-  "39",
-  "40",
-  "41",
-  "42",
-  "43",
-  "44",
-  "45",
-  "46",
-  "47",
-  "48",
+// ✅ Wood finishes
+const finishes = [
+  "Natural",
+  "Polished",
+  "Matte",
+  "Glossy",
+  "Dark Stain",
+  "Light Stain",
 ] as const;
 
+// ✅ Available sizes
+const dimensions = [
+  "2x2",
+  "2x4",
+  "4x4",
+  "4x6",
+  "6x6",
+  "Custom Size",
+] as const;
+
+// ✅ Zod schema for validation
 const formSchema = z.object({
   name: z.string().min(1, { message: "Product name is required!" }),
   shortDescription: z
     .string()
     .min(1, { message: "Short description is required!" })
-    .max(60),
+    .max(120),
   description: z.string().min(1, { message: "Description is required!" }),
-  price: z.number().min(1, { message: "Price is required!" }),
+  price: z.coerce.number().min(1, { message: "Price is required!" }),
   category: z.enum(categories),
-  sizes: z.array(z.enum(sizes)),
-  colors: z.array(z.enum(colors)),
-  images: z.record(z.enum(colors), z.string()),
+  woodType: z.enum(woodTypes),
+  dimensions: z.array(z.enum(dimensions)).nonempty({
+    message: "At least one dimension must be selected.",
+  }),
+  finishes: z.array(z.enum(finishes)),
+  image: z.any().optional(),
 });
 
 const AddProduct = () => {
+  const [uploading, setUploading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      shortDescription: "",
+      description: "",
+      price: 0,
+      category: undefined,
+      woodType: undefined,
+      dimensions: [],
+      finishes: [],
+      image: undefined,
+    },
   });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setUploading(true);
+
+      // ✅ Convert data to backend-friendly JSON
+      const productData = {
+        name: values.name,
+        description: values.description,
+        price: values.price,
+        category: values.category,
+        shortDescription: values.shortDescription,
+        woodType: values.woodType,
+        dimensions: values.dimensions.join(", "),
+        finishes: values.finishes.join(", "),
+      };
+
+      // ✅ FIXED: Use POST instead of GET
+      const res = await fetch("http://localhost:8080/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productData),
+      });
+
+      if (res.ok) {
+        toast.success("✅ Wood product added successfully!");
+        form.reset();
+      } else {
+        const text = await res.text();
+        console.error("Server error:", text);
+        toast.error("❌ Failed to add product. Check backend logs.");
+      }
+    } catch (err) {
+      console.error("❌ Add product error:", err);
+      toast.error("An error occurred while adding the product.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <SheetContent>
       <ScrollArea className="h-screen">
         <SheetHeader>
-          <SheetTitle className="mb-4">Add Product</SheetTitle>
+          <SheetTitle className="mb-4">Add Wood Product</SheetTitle>
           <SheetDescription asChild>
             <Form {...form}>
-              <form className="space-y-8">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8 pb-8"
+              >
+                {/* Product Name */}
                 <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>Product Name</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} placeholder="Eg: Akeshiya Timber" />
                       </FormControl>
-                      <FormDescription>
-                        Enter the name of the product.
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {/* Short Description */}
                 <FormField
                   control={form.control}
                   name="shortDescription"
@@ -128,47 +184,50 @@ const AddProduct = () => {
                     <FormItem>
                       <FormLabel>Short Description</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input
+                          {...field}
+                          placeholder="Eg: High-quality Akeshiya timber"
+                        />
                       </FormControl>
-                      <FormDescription>
-                        Enter the short description of the product.
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {/* Full Description */}
                 <FormField
                   control={form.control}
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>Full Description</FormLabel>
                       <FormControl>
-                        <Textarea {...field} />
+                        <Textarea
+                          {...field}
+                          placeholder="Describe wood texture, use cases, etc."
+                        />
                       </FormControl>
-                      <FormDescription>
-                        Enter the description of the product.
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {/* Price */}
                 <FormField
                   control={form.control}
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price</FormLabel>
+                      <FormLabel>Price (LKR)</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input type="number" step="0.01" {...field} />
                       </FormControl>
-                      <FormDescription>
-                        Enter the price of the product.
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {/* Category */}
                 <FormField
                   control={form.control}
                   name="category"
@@ -176,7 +235,10 @@ const AddProduct = () => {
                     <FormItem>
                       <FormLabel>Category</FormLabel>
                       <FormControl>
-                        <Select>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
@@ -189,117 +251,123 @@ const AddProduct = () => {
                           </SelectContent>
                         </Select>
                       </FormControl>
-                      <FormDescription>
-                        Enter the category of the product.
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {/* Wood Type */}
                 <FormField
                   control={form.control}
-                  name="sizes"
+                  name="woodType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Sizes</FormLabel>
+                      <FormLabel>Wood Type</FormLabel>
                       <FormControl>
-                        <div className="grid grid-cols-3 gap-4 my-2">
-                          {sizes.map((size) => (
-                            <div className="flex items-center gap-2" key={size}>
-                              <Checkbox
-                                id="size"
-                                checked={field.value?.includes(size)}
-                                onCheckedChange={(checked) => {
-                                  const currentValues = field.value || [];
-                                  if (checked) {
-                                    field.onChange([...currentValues, size]);
-                                  } else {
-                                    field.onChange(
-                                      currentValues.filter((v) => v !== size)
-                                    );
-                                  }
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select wood type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {woodTypes.map((type) => (
+                              <SelectItem key={type} value={type}>
+                                {type}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Dimensions */}
+                <FormField
+                  control={form.control}
+                  name="dimensions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Available Dimensions</FormLabel>
+                      <FormControl>
+                        <div className="grid grid-cols-2 gap-3">
+                          {dimensions.map((dim) => (
+                            <label key={dim} className="flex items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={field.value?.includes(dim)}
+                                onChange={(e) => {
+                                  const newVal = e.target.checked
+                                    ? [...(field.value || []), dim]
+                                    : field.value.filter((v) => v !== dim);
+                                  field.onChange(newVal);
                                 }}
                               />
-                              <label htmlFor="size" className="text-xs">
-                                {size}
-                              </label>
-                            </div>
+                              {dim}
+                            </label>
                           ))}
                         </div>
                       </FormControl>
-                      <FormDescription>
-                        Select the available sizes for the product.
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {/* Finishes */}
                 <FormField
                   control={form.control}
-                  name="colors"
+                  name="finishes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Colors</FormLabel>
+                      <FormLabel>Wood Finishes</FormLabel>
                       <FormControl>
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-3 gap-4 my-2">
-                            {colors.map((color) => (
-                              <div
-                                className="flex items-center gap-2"
-                                key={color}
-                              >
-                                <Checkbox
-                                  id="color"
-                                  checked={field.value?.includes(color)}
-                                  onCheckedChange={(checked) => {
-                                    const currentValues = field.value || [];
-                                    if (checked) {
-                                      field.onChange([...currentValues, color]);
-                                    } else {
-                                      field.onChange(
-                                        currentValues.filter((v) => v !== color)
-                                      );
-                                    }
-                                  }}
-                                />
-                                <label
-                                  htmlFor="color"
-                                  className="text-xs flex items-center gap-2"
-                                >
-                                  <div
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: color }}
-                                  />
-                                  {color}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                          {field.value && field.value.length > 0 && (
-                            <div className="mt-8 space-y-4">
-                              <p className="text-sm font-medium">Upload images for selected colors:</p>
-                              {field.value.map((color) => (
-                                <div className="flex items-center gap-2" key={color}>
-                                  <div
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: color }}
-                                  />
-                                  <span className="text-sm min-w-[60px]">{color}</span>
-                                  <Input type="file" accept="image/*" />
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                        <div className="grid grid-cols-2 gap-3">
+                          {finishes.map((finish) => (
+                            <label key={finish} className="flex items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={field.value?.includes(finish)}
+                                onChange={(e) => {
+                                  const newVal = e.target.checked
+                                    ? [...(field.value || []), finish]
+                                    : field.value.filter((v) => v !== finish);
+                                  field.onChange(newVal);
+                                }}
+                              />
+                              {finish}
+                            </label>
+                          ))}
                         </div>
                       </FormControl>
-                      <FormDescription>
-                        Select the available colors for the product.
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit">Submit</Button>
+
+                {/* Image Upload */}
+                <FormField
+                  control={form.control}
+                  name="image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Upload Image</FormLabel>
+                      <FormControl>
+                        <Input type="file" accept="image/*" onChange={(e) => field.onChange(e.target.files)} />
+                      </FormControl>
+                      <FormDescription>
+                        Upload a representative image for the wood.
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+
+                {/* Submit Button */}
+                <Button type="submit" disabled={uploading}>
+                  {uploading ? "Uploading..." : "Add Product"}
+                </Button>
               </form>
             </Form>
           </SheetDescription>
