@@ -2,6 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,6 +17,7 @@
     <artifactId>ecommerce-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>ECommerce Backend</name>
+    <description>Spring Boot backend for E-commerce platform (merged with Woodmoon features)</description>
     <description>Spring Boot backend for E-commerce platform</description>
 
     <properties>
@@ -24,6 +26,7 @@
     </properties>
 
     <dependencies>
+        <!-- ✅ Core Spring Boot Starters -->
         <!-- ✅ Spring Boot Core Starters -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -40,12 +43,21 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <!-- ✅ MySQL Connector -->
         <!-- ✅ Database Connector -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- ✅ Email (from friend’s project) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!-- ✅ Lombok (Boilerplate reduction) -->
         
         <!-- ✅ Utilities and Developer Tools -->
         <dependency>
@@ -54,12 +66,15 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- ✅ Developer Tools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+
+        <!-- ✅ JWT Authentication -->
         
         <!-- ✅ JWT Implementation -->
         <dependency>
@@ -80,6 +95,7 @@
             <version>${jjwt.version}</version>
         </dependency>
 
+        <!-- ✅ Testing -->
         <!-- ✅ Testing Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -114,6 +130,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -123,6 +141,7 @@
                 </configuration>
             </plugin>
 
+            <!-- ✅ Skip Tests for faster development -->
             <!-- ✅ Skip Tests Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -131,6 +150,7 @@
                     <skipTests>true</skipTests>
                 </configuration>
             </plugin>
+
             
             <!-- ✅ Spring Boot Plugin -->
             <plugin>
@@ -147,4 +167,6 @@
             </plugin>
         </plugins>
     </build>
+
+</project>
 </project>
