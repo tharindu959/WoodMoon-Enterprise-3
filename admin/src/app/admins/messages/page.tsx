@@ -11,49 +11,80 @@ interface ContactMessage {
   replied: boolean;
   responseMessage: string;
   createdAt?: string;
-  starred?: boolean; // ⭐ new field for highlights
+  starred?: boolean;
+  type?: string;
+  rating?: number;
 }
 
 export default function MessagesPage() {
-  const API_URL = "http://localhost:8090/api/contact";
+  const API_URL = "http://localhost:8080/api/contact";
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [replyText, setReplyText] = useState<{ [key: number]: string }>({});
   const [sortOrder, setSortOrder] = useState("newest");
+  const [messageType, setMessageType] = useState<"questions" | "feedbacks" | "ratings">(
+    "questions"
+  );
+  const [ratingSummary, setRatingSummary] = useState<{
+    averageRating: number;
+    totalFeedbacks: number;
+  } | null>(null);
 
-  // ✅ Fetch messages
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // ✅ Fetch messages or ratings
   const fetchMessages = async () => {
+    setLoading(true);
+    setError("");
     try {
-      const res = await fetch(API_URL);
-      if (res.ok) {
-        let data = await res.json();
+      if (messageType === "ratings") {
+        const res = await fetch(`${API_URL}/ratings-summary`);
+        if (res.ok) {
+          const data = await res.json();
+          setRatingSummary(data);
+        }
+        setMessages([]);
+        setLoading(false);
+        return;
+      }
 
-        // Sort options
+      const res = await fetch(`${API_URL}/${messageType}`);
+      if (res.ok) {
+        const json = await res.json();
+        const data = Array.isArray(json) ? json : json.data || [];
+
+        let sortedData = [...data];
         if (sortOrder === "newest") {
-          data.sort(
+          sortedData.sort(
             (a: any, b: any) =>
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
         } else if (sortOrder === "oldest") {
-          data.sort(
+          sortedData.sort(
             (a: any, b: any) =>
               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
           );
         } else if (sortOrder === "unread") {
-          data = data.filter((m: any) => !m.replied);
+          sortedData = sortedData.filter((m: any) => !m.replied);
         } else if (sortOrder === "starred") {
-          data = data.filter((m: any) => m.starred);
+          sortedData = sortedData.filter((m: any) => m.starred);
         }
 
-        setMessages(data);
+        setMessages(sortedData);
+      } else {
+        setError("Server error while fetching messages.");
       }
     } catch (err) {
       console.error("Failed to fetch messages:", err);
+      setError("Could not connect to the backend.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchMessages();
-  }, [sortOrder]);
+  }, [messageType, sortOrder]);
 
   // ✅ Reply
   const handleReply = async (id: number) => {
@@ -88,26 +119,26 @@ export default function MessagesPage() {
     }
   };
 
-  // ✅ Toggle star (highlight)
+  // ✅ Toggle star
   const toggleStar = async (id: number) => {
     const updated = messages.map((msg) =>
       msg.id === id ? { ...msg, starred: !msg.starred } : msg
     );
     setMessages(updated);
 
-    // Optional backend sync (if you want to save stars)
     try {
       await fetch(`${API_URL}/star/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ starred: !messages.find((m) => m.id === id)?.starred }),
+        body: JSON.stringify({
+          starred: !messages.find((m) => m.id === id)?.starred,
+        }),
       });
     } catch {
-      console.warn("Highlight not persisted — backend endpoint not implemented yet.");
+      console.warn("Highlight not persisted — backend may not have star endpoint.");
     }
   };
 
-  // ✅ Format time
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -118,20 +149,56 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-10 space-y-10">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
-          Client Messages
-        </h1>
+      <h1 className="text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 drop-shadow-md">
+        Client Messages
+      </h1>
 
-        {/* Sorting */}
-        <div className="flex items-center gap-3">
-          <label className="font-medium text-gray-700">Sort by:</label>
+      {/* Tabs */}
+      <div className="flex justify-center gap-8 mb-8">
+        <button
+          onClick={() => setMessageType("questions")}
+          className={`px-8 py-4 text-lg rounded-2xl font-bold shadow-md transition-transform duration-300 ${
+            messageType === "questions"
+              ? "bg-blue-600 text-white scale-105"
+              : "bg-gray-100 text-gray-800 hover:bg-blue-100"
+          }`}
+        >
+          💬 Questions
+        </button>
+
+        <button
+          onClick={() => setMessageType("feedbacks")}
+          className={`px-8 py-4 text-lg rounded-2xl font-bold shadow-md transition-transform duration-300 ${
+            messageType === "feedbacks"
+              ? "bg-amber-400 text-white scale-105"
+              : "bg-gray-100 text-gray-800 hover:bg-amber-100"
+          }`}
+        >
+          📝 Feedbacks
+        </button>
+
+        <button
+          onClick={() => setMessageType("ratings")}
+          className={`px-8 py-4 text-lg rounded-2xl font-bold shadow-md transition-transform duration-300 ${
+            messageType === "ratings"
+              ? "bg-green-500 text-white scale-105"
+              : "bg-gray-100 text-gray-800 hover:bg-green-100"
+          }`}
+        >
+          ⭐ Ratings
+        </button>
+      </div>
+
+      {/* Sort Menu */}
+      {messageType !== "ratings" && (
+        <div className="flex items-center gap-3 justify-center">
+          <label className="font-medium text-gray-700 text-lg">Sort by:</label>
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700"
           >
             <option value="newest">Newest</option>
             <option value="oldest">Oldest</option>
@@ -139,18 +206,36 @@ export default function MessagesPage() {
             <option value="starred">Starred</option>
           </select>
         </div>
-      </div>
+      )}
+
+      {/* Loading / Error */}
+      {loading && <p className="text-gray-500 text-center">Loading messages...</p>}
+      {error && <p className="text-red-600 font-semibold text-center">{error}</p>}
+
+      {/* Ratings Summary */}
+      {messageType === "ratings" && ratingSummary && (
+        <div className="mt-8 p-8 rounded-2xl border bg-green-50 shadow text-center max-w-xl mx-auto">
+          <h2 className="text-4xl font-bold text-green-700 mb-3">⭐ Ratings Summary</h2>
+          <p className="text-xl text-gray-700">
+            Average Rating: <strong>{ratingSummary.averageRating}</strong> / 5
+          </p>
+          <p className="text-lg text-gray-600">
+            Total Count: <strong>{ratingSummary.totalFeedbacks}</strong>
+          </p>
+          <div className="flex justify-center mt-4 text-yellow-400 text-5xl">
+            {"★".repeat(Math.round(ratingSummary.averageRating))}
+            {"☆".repeat(5 - Math.round(ratingSummary.averageRating))}
+          </div>
+        </div>
+      )}
 
       {/* Messages */}
-      <div className="space-y-4">
-        {messages.length === 0 && (
-          <p className="text-gray-500">No messages found.</p>
-        )}
-
-        {messages.map((msg) => (
+      {messageType !== "ratings" &&
+        !loading &&
+        messages.map((msg) => (
           <div
             key={msg.id}
-            className={`p-6 rounded-xl border shadow-sm transition ${
+            className={`p-6 rounded-2xl border shadow-sm transition ${
               msg.starred
                 ? "bg-yellow-50 border-yellow-300"
                 : msg.replied
@@ -158,7 +243,6 @@ export default function MessagesPage() {
                 : "bg-blue-50 border-blue-300"
             }`}
           >
-            {/* Top Section */}
             <div className="flex justify-between items-start">
               <div>
                 <div className="flex items-center gap-2">
@@ -167,14 +251,21 @@ export default function MessagesPage() {
                   ) : (
                     <Mail className="text-blue-600 w-5 h-5" />
                   )}
-                  <h2 className="text-lg font-semibold">{msg.name}</h2>
+                  <h2 className="text-xl font-semibold">{msg.name}</h2>
                 </div>
                 <p className="text-sm text-gray-600">{msg.email}</p>
                 <p className="text-sm text-gray-400">{formatDate(msg.createdAt)}</p>
                 <p className="mt-2 text-gray-800">{msg.message}</p>
+
+                {/* Stars for feedbacks */}
+                {msg.type === "feedback" && msg.rating && (
+                  <div className="mt-2 text-yellow-500 text-lg">
+                    {"★".repeat(msg.rating)}{"☆".repeat(5 - msg.rating)}
+                  </div>
+                )}
               </div>
 
-              {/* Actions: Star + Delete */}
+              {/* Actions */}
               <div className="flex gap-3">
                 <button
                   onClick={() => toggleStar(msg.id)}
@@ -185,7 +276,10 @@ export default function MessagesPage() {
                       : "text-gray-400 hover:text-yellow-500"
                   }`}
                 >
-                  <Star className="w-5 h-5" fill={msg.starred ? "currentColor" : "none"} />
+                  <Star
+                    className="w-5 h-5"
+                    fill={msg.starred ? "currentColor" : "none"}
+                  />
                 </button>
                 <button
                   onClick={() => handleDelete(msg.id)}
@@ -196,33 +290,34 @@ export default function MessagesPage() {
               </div>
             </div>
 
-            {/* Reply or Response */}
+            {/* ✅ Reply / Response */}
             {msg.replied ? (
               <div className="mt-3 p-3 border rounded-md bg-green-50 text-gray-800">
                 <strong>Response:</strong> {msg.responseMessage}
               </div>
             ) : (
-              <div className="flex gap-2 mt-4">
-                <input
-                  type="text"
-                  placeholder="Write a reply..."
-                  value={replyText[msg.id] || ""}
-                  onChange={(e) =>
-                    setReplyText({ ...replyText, [msg.id]: e.target.value })
-                  }
-                  className="flex-1 border border-gray-300 rounded-lg p-2"
-                />
-                <button
-                  onClick={() => handleReply(msg.id)}
-                  className="bg-blue-600 text-white px-4 rounded-lg flex items-center gap-1 hover:bg-blue-700"
-                >
-                  <Send className="w-4 h-4" /> Reply
-                </button>
-              </div>
+              messageType === "questions" && (
+                <div className="flex gap-2 mt-4">
+                  <input
+                    type="text"
+                    placeholder="Write a reply..."
+                    value={replyText[msg.id] || ""}
+                    onChange={(e) =>
+                      setReplyText({ ...replyText, [msg.id]: e.target.value })
+                    }
+                    className="flex-1 border border-gray-300 rounded-lg p-2"
+                  />
+                  <button
+                    onClick={() => handleReply(msg.id)}
+                    className="bg-blue-600 text-white px-4 rounded-lg flex items-center gap-1 hover:bg-blue-700"
+                  >
+                    <Send className="w-4 h-4" /> Reply
+                  </button>
+                </div>
+              )
             )}
           </div>
         ))}
-      </div>
     </div>
   );
 }

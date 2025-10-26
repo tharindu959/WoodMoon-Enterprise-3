@@ -26,7 +26,7 @@ export default function ContactMessagePage() {
       const res = await fetch(API_URL);
       if (res.ok) {
         const data = await res.json();
-        setMessages(data);
+        setMessages(data.data || []); // ✅ Fix: use data.data from backend response
       } else {
         console.error("Failed to fetch messages");
       }
@@ -74,7 +74,7 @@ export default function ContactMessagePage() {
     setReplyText({ ...replyText, [id]: value });
   };
 
-  // Send reply to backend
+  // ✅ Fixed: Send reply properly as JSON { responseMessage: "text" }
   const handleReply = async (id: number) => {
     const text = replyText[id];
     if (!text) return;
@@ -83,7 +83,7 @@ export default function ContactMessagePage() {
       const res = await fetch(`${API_URL}/reply/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(text),
+        body: JSON.stringify({ responseMessage: text }), // ✅ FIXED LINE
       });
 
       if (res.ok) {
@@ -150,7 +150,7 @@ export default function ContactMessagePage() {
         <div className="overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
           <iframe
             title="Shop Location"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3163.123456789!2d80.123456!3d6.85!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae259123456789%3A0xabcdef123456!2sHomagama%2C%20Sri%20Lanka!5e0!3m2!1sen!2sus!4v1690000000000!5m2!1sen!2sus"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6337.679232238673!2d79.9854577!3d6.843649!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae25b2dc8f8b2c7%3A0x9b7d523b6c8b8db!2sPanagoda%2C%20Homagama!5e0!3m2!1sen!2slk!4v1735231234567!5m2!1sen!2slk"
             width="100%"
             height="100%"
             className="aspect-[16/9] w-full"
