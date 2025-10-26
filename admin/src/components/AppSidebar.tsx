@@ -199,6 +199,16 @@ const AppSidebar = () => {
                   </Sheet>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+
+              {/* ✅ Client Messages Section Added */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/admins/messages">
+                    <Inbox />
+                    Client Messages
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

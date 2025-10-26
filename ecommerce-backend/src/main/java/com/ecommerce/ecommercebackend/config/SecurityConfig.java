@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
@@ -35,66 +37,71 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    // ✅ Main Security Configuration
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // ✅ Enable CORS and disable CSRF
             .cors().and()
             .csrf(csrf -> csrf.disable())
-
-            // ✅ Define which endpoints are public or protected
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints (no JWT required)
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/admins/all").permitAll()
                 .requestMatchers("/api/admins/create").permitAll()
-                .requestMatchers("/api/admins/{id}").permitAll()  // ✅ allow single admin fetch
-                .requestMatchers("/api/admins/**").permitAll()    // ✅ allow delete & get single admin
+                .requestMatchers("/api/admins/{id}").permitAll()
+                .requestMatchers("/api/admins/**").permitAll()
 
+                // ✅ Fix Contact Us and Messages page
+                .requestMatchers("/api/contact/**").permitAll()
 
-                // Protect everything else (requires valid JWT)
                 .anyRequest().authenticated()
             )
-
-            // ✅ Use stateless session (JWT-based)
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-
-            // ✅ Add JWT filter before UsernamePasswordAuthenticationFilter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ✅ Authentication Manager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
-    // ✅ Password Encoder (for hashing)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ CORS Configuration (allow both client + admin panels)
+    // ✅ FIXED: Added PATCH + improved CORS safety
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000", // Client frontend
-            "http://localhost:3001"  // Admin frontend
+            "http://localhost:3000", // client
+            "http://localhost:3001"  // admin
         ));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    // ✅ Optional Global CORS Configurer (extra safety)
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**")
+                        .allowedOrigins("http://localhost:3000", "http://localhost:3001")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowCredentials(true);
+            }
+        };
     }
 }

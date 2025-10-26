@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import {
   ColumnDef,
   flexRender,
@@ -19,17 +20,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/TablePagination";
-import { useState } from "react";
 import { Trash2 } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onDelete?: (ids: number[]) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onDelete,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -42,18 +44,22 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      rowSelection,
-    },
+    state: { sorting, rowSelection },
   });
+
+  const selectedIds = table
+    .getSelectedRowModel()
+    .flatRows.map((row) => (row.original as any).id);
 
   return (
     <div className="rounded-md border">
-      {Object.keys(rowSelection).length > 0 && (
+      {selectedIds.length > 0 && (
         <div className="flex justify-end">
-          <button className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer">
-            <Trash2 className="w-4 h-4"/>
+          <button
+            onClick={() => onDelete && onDelete(selectedIds)}
+            className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer"
+          >
+            <Trash2 className="w-4 h-4" />
             Delete Product(s)
           </button>
         </div>
@@ -62,18 +68,16 @@ export function DataTable<TData, TValue>({
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              ))}
             </TableRow>
           ))}
         </TableHeader>
