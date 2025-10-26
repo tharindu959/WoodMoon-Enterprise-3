@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Quotations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center">Admin Panel - Quotations</h2>
+    <table class="table table-bordered table-striped" id="quotationsTable">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Quotation Details</th>
+            <th>Date Submitted</th>
+            <th>Actions</th> <!-- Column for Delete button -->
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Data will be inserted here by JS -->
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    function fetchQuotations() {
+        $.ajax({
+            url: "http://localhost:8080/api/quotations", // Backend GET endpoint
+            type: "GET",
+            success: function(data) {
+                const tbody = $("#quotationsTable tbody");
+                tbody.empty(); // Clear previous data
+
+                data.forEach(q => {
+                    const row = `
+                        <tr>
+                            <td>${q.id}</td>
+                            <td>${q.name}</td>
+                            <td>${q.phone}</td>
+                            <td>${q.quotationDetails}</td>
+                            <td>${q.dateSubmitted || ''}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deleteQuotation(${q.id})">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+            },
+            error: function(err) {
+                alert("Error fetching quotations. Check console.");
+                console.error(err);
+            }
+        });
+    }
+
+    function deleteQuotation(id) {
+        if (confirm("Are you sure you want to delete this quotation?")) {
+            $.ajax({
+                url: `http://localhost:8080/api/quotations/${id}`,
+                type: "DELETE",
+                success: function(response) {
+                    alert(response); // shows success or not found message
+                    fetchQuotations(); // refresh table after deletion
+                },
+                error: function(err) {
+                    alert("Error deleting quotation. Check console.");
+                    console.error(err);
+                }
+            });
+        }
+    }
+
+    // Fetch data on page load
+    $(document).ready(function() {
+        fetchQuotations();
+    });
+</script>
+</body>
+</html>

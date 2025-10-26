@@ -1,0 +1,304 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    margin-top: 30px;
+    max-width: 1100px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(255, 87, 34, 0.15);
+    border: 1px solid #ffccbc;
+    position: relative;
+    overflow: hidden;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff5722, #ff9800, #ff5722);
+}
+
+h2 {
+    margin-bottom: 25px;
+    color: #e65100;
+    font-weight: 700;
+    font-size: 2.2em;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(230, 81, 0, 0.1);
+    position: relative;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #ff5722, #ff9800);
+    border-radius: 2px;
+}
+
+table {
+    margin-top: 25px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.1);
+    border: 1px solid #ffccbc;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    color: white;
+    border: none;
+    padding: 18px 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 14px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table tbody td {
+    padding: 16px 15px;
+    text-align: center;
+    vertical-align: middle;
+    border-color: #ffe0b2;
+    color: #bf360c;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background: linear-gradient(135deg, #fff8e1, #fff3e0);
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background: #fffaf0;
+}
+
+.table-hover tbody tr:hover {
+    background: linear-gradient(135deg, #ffecb3, #ffe0b2);
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.2);
+}
+
+.table-hover tbody tr:hover td {
+    color: #e65100;
+    font-weight: 600;
+}
+
+/* Action buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(255, 87, 34, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #f4511e, #fb8c00);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 87, 34, 0.4);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ff5252, #d32f2f);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(255, 82, 82, 0.3);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #ff1744, #c2185b);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
+}
+
+/* Status badges */
+.badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    color: white;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+}
+
+.badge-danger {
+    background: linear-gradient(135deg, #ff5252, #d32f2f);
+    color: white;
+}
+
+/* Table responsive */
+.table-responsive {
+    border-radius: 12px;
+    border: 1px solid #ffccbc;
+}
+
+/* Loading animation */
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.loading-row {
+    animation: shimmer 1.5s infinite linear;
+    background: linear-gradient(90deg, #fff3e0, #ffe0b2, #fff3e0);
+    background-size: 200px 100%;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: #bf360c;
+}
+
+.empty-state i {
+    font-size: 4em;
+    margin-bottom: 20px;
+    color: #ffccbc;
+}
+
+.empty-state h4 {
+    color: #e65100;
+    margin-bottom: 10px;
+}
+
+/* Search and filter */
+.search-box {
+    background: linear-gradient(135deg, #fff8e1, #fff3e0);
+    border: 2px solid #ffccbc;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.1);
+}
+
+.search-box .form-control {
+    border: 2px solid #ffe0b2;
+    border-radius: 8px;
+    padding: 12px 15px;
+    background: #fffaf0;
+    transition: all 0.3s ease;
+}
+
+.search-box .form-control:focus {
+    border-color: #ff9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
+    background: #fff;
+}
+
+/* Pagination */
+.pagination .page-link {
+    color: #ff5722;
+    border: 1px solid #ffccbc;
+    padding: 10px 18px;
+    margin: 0 3px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    color: white;
+    border-color: #ff5722;
+    transform: translateY(-2px);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    border-color: #ff5722;
+    color: white;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        margin: 10px;
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    h2 {
+        font-size: 1.8em;
+    }
+
+    .table-responsive {
+        border: none;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    .table thead th {
+        padding: 12px 8px;
+        font-size: 12px;
+    }
+
+    .table tbody td {
+        padding: 12px 8px;
+    }
+
+    .btn-primary, .btn-danger {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+/* Animation for table rows */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.table tbody tr {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+.table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+.table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+.table tbody tr:nth-child(5) { animation-delay: 0.5s; }

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woodmoon Enterprises - Admin Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin-home.css">
+</head>
+<body>
+<!-- Welcome Header -->
+<div class="welcome-header">
+    <div class="welcome-icons">
+        <div class="welcome-icon">⚡</div>
+        <div class="welcome-icon">🔧</div>
+        <div class="welcome-icon">🚀</div>
+        <div class="welcome-icon">⭐</div>
+        <div class="welcome-icon">💎</div>
+    </div>
+
+    <h1 class="welcome-title">Welcome to Woodmoon Enterprises</h1>
+    <div class="welcome-subtitle">Admin Management Portal</div>
+    <div class="admin-badge">Administrator Access</div>
+</div>
+
+<!-- Main Container -->
+<div class="container d-flex flex-column justify-content-center min-vh-100">
+    <!-- Dashboard Cards - MODIFIED -->
+    <div class="row dashboard-cards justify-content-center">
+        <div class="col-md-4 mb-4">
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+                <h3>Product Management</h3>
+                <p>Add, edit, and manage your product catalog</p>
+                <button class="btn btn-primary" onclick="redirectTo('admin-products.html')">
+                    <i class="fas fa-arrow-right"></i> Manage Products
+                </button>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <h3>Quotations</h3>
+                <p>View and manage customer quotations</p>
+                <button class="btn btn-success" onclick="redirectTo('admin.html')">
+                    <i class="fas fa-arrow-right"></i> View Quotations
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <button class="action-btn" onclick="redirectTo('admin-products.html')">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Product</span>
+                </button>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <button class="action-btn" onclick="redirectTo('admin.html')">
+                    <i class="fas fa-list"></i>
+                    <span>View Quotes</span>
+                </button>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <button class="action-btn" onclick="redirectTo('catalog.html')">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>see catalog</span>
+                </button>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+
+</div>
+
+<script>
+    function redirectTo(page) {
+        window.location.href = page;
+    }
+</script>
+</body>
+</html>

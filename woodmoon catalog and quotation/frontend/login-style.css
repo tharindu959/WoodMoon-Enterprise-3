@@ -1,0 +1,38 @@
+/* Center login card */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to right, #4e54c8, #8f94fb);
+}
+
+.login-card {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 350px;
+}
+
+.login-card h2 {
+    margin-bottom: 25px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-control {
+    border-radius: 5px;
+    height: 45px;
+}
+
+.btn-primary {
+    background-color: #4e54c8;
+    border: none;
+    height: 45px;
+    font-size: 16px;
+}
+
+.btn-primary:hover {
+    background-color: #3b3fc1;
+}

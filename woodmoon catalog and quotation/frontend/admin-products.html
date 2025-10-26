@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Add Products</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(255, 87, 34, 0.15);
+            border: 1px solid #ffccbc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff5722, #ff9800, #ff5722);
+        }
+
+        h1 {
+            text-align: center;
+            color: #e65100;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(230, 81, 0, 0.1);
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #ff5722, #ff9800);
+            border-radius: 2px;
+        }
+
+        h2 {
+            color: #e65100;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ff9800;
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ffccbc, transparent);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #bf360c;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #ffe0b2;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fffaf0;
+            box-shadow: inset 0 2px 4px rgba(255, 152, 0, 0.1);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #ff9800;
+            box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2),
+                        inset 0 2px 4px rgba(255, 152, 0, 0.1);
+            background: #fff;
+            transform: translateY(-2px);
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff5722, #ff9800);
+            color: white;
+            padding: 16px 45px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #f4511e, #fb8c00);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 87, 34, 0.4);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #a5d6a7, #81c784);
+            color: #1b5e20;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: none;
+            text-align: center;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(165, 214, 167, 0.3);
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #ef9a9a, #e57373);
+            color: #b71c1c;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: none;
+            text-align: center;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(239, 154, 154, 0.3);
+        }
+
+        .products-section {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #ffccbc;
+        }
+
+        .product-item {
+            background: linear-gradient(135deg, #fff8e1, #fff3e0);
+            border: 2px solid #ffccbc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.1);
+        }
+
+        .product-item:hover {
+            transform: translateX(8px);
+            border-color: #ff9800;
+            box-shadow: 0 8px 25px rgba(255, 152, 0, 0.2);
+        }
+
+        .product-item h3 {
+            color: #e65100;
+            margin-bottom: 12px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .product-item p {
+            margin-bottom: 10px;
+            color: #bf360c;
+            font-weight: 500;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ff5252, #d32f2f);
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(255, 82, 82, 0.3);
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #ff1744, #c2185b);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
+        }
+
+        .nav-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            color: white;
+            padding: 14px 30px;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .nav-link:hover {
+            background: linear-gradient(135deg, #43a047, #1b5e20);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Custom scrollbar */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        textarea::-webkit-scrollbar-track {
+            background: #fff3e0;
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ff9800, #ff5722);
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f57c00, #e64a19);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            button {
+                width: 100%;
+                padding: 14px 20px;
+            }
+
+            .nav-link {
+                display: block;
+                text-align: center;
+                width: 100%;
+            }
+
+            input, textarea {
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Add New Product</h1>
+    <form id="productForm">
+        <div class="form-group">
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" name="productName" required>
+        </div>
+
+        <div class="form-group">
+            <label for="productDescription">Description:</label>
+            <textarea id="productDescription" name="productDescription" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="productImageUrl">Image URL:</label>
+            <input type="text" id="productImageUrl" name="productImageUrl" required
+                   placeholder="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop">
+        </div>
+
+        <div class="form-group">
+            <label for="productPrice">Price ($):</label>
+            <input type="number" id="productPrice" name="productPrice" step="0.01" min="0" required>
+        </div>
+
+        <button type="submit">Add Product</button>
+    </form>
+    <div id="message"></div>
+
+    <div class="products-section">
+        <h2>Current Products</h2>
+        <div id="productsList"></div>
+    </div>
+
+    <a href="catalog.html" class="nav-link">View Product Catalog</a>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost:8080/api';
+
+    // Handle form submission
+    document.getElementById('productForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const productData = {
+            productName: document.getElementById('productName').value,
+            productDescription: document.getElementById('productDescription').value,
+            productImageUrl: document.getElementById('productImageUrl').value,
+            productPrice: parseFloat(document.getElementById('productPrice').value)
+        };
+
+        try {
+            const response = await fetch(API_BASE + '/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(productData)
+            });
+
+            if (response.ok) {
+                showMessage('Product added successfully!', 'success');
+                document.getElementById('productForm').reset();
+                loadProducts();
+            } else {
+                showMessage('Error adding product', 'error');
+            }
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    });
+
+    // Load and display products
+    async function loadProducts() {
+        try {
+            const response = await fetch(API_BASE + '/products');
+            const products = await response.json();
+
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+
+            if (products.length === 0) {
+                productsList.innerHTML = '<p style="text-align: center; color: #bf360c; padding: 20px;">No products found.</p>';
+                return;
+            }
+
+            products.forEach(product => {
+                const productDiv = document.createElement('div');
+                productDiv.className = 'product-item';
+
+                productDiv.innerHTML = `
+                    <h3>${product.productName}</h3>
+                    <p><strong>Description:</strong> ${product.productDescription}</p>
+                    <p><strong>Price:</strong> $${product.productPrice}</p>
+                    <p><strong>Image URL:</strong> ${product.productImageUrl}</p>
+                    <button class="delete-btn" onclick="deleteProduct(${product.id})">Delete Product</button>
+                `;
+
+                productsList.appendChild(productDiv);
+            });
+        } catch (error) {
+            console.error('Error loading products:', error);
+            showMessage('Error loading products', 'error');
+        }
+    }
+
+    // Delete product
+    async function deleteProduct(id) {
+        if (confirm('Are you sure you want to delete this product?')) {
+            try {
+                const response = await fetch(API_BASE + '/' + id, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showMessage('Product deleted successfully!', 'success');
+                    loadProducts();
+                } else {
+                    showMessage('Error deleting product', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                showMessage('Error deleting product', 'error');
+            }
+        }
+    }
+
+    // Show message
+    function showMessage(message, type) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.innerHTML = `<div class="${type}-message">${message}</div>`;
+
+        // Auto-hide success messages after 3 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 3000);
+        }
+    }
+
+    // Load products when page loads
+    document.addEventListener('DOMContentLoaded', loadProducts);
+</script>
+</body>
+</html>
