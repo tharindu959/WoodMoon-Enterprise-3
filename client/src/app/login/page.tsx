@@ -1,12 +1,18 @@
 "use client";
+
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import useAuthStore from "@/stores/authStore";
 import "../auth.css";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const router = useRouter();
+
+  const loginStore = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,10 +27,15 @@ export default function LoginPage() {
 
       if (response.ok) {
         const token = await response.text();
-        localStorage.setItem("token", token); // Save JWT for later use
+
+        // ✅ Save login info in Zustand store
+        loginStore.login(email, token);
+
         setMessage("✅ Login successful!");
-        // Optionally redirect
-        // window.location.href = "/dashboard";
+        localStorage.setItem("token", token);
+
+        // Redirect to homepage or cart
+        router.push("/");
       } else {
         setMessage("❌ Invalid email or password.");
       }
